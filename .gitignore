@@ -1,5 +1,23 @@
+# Generic
+.DS_Store
+
+
 # Compiled class file
 *.class
+
+# Project Files
+.idea/
+*.iml
+*.iws
+log/
+.classpath
+.project
+.settings/
+build/
+
+gradle/
+.gradle/
+
 
 # Log file
 *.log
