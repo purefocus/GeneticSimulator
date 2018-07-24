@@ -1,7 +1,8 @@
 package me.brandon.ai.gensim.world;
 
 import me.brandon.ai.config.ConfigOption;
-import org.w3c.dom.css.Rect;
+import me.brandon.ai.ui.Drawable;
+import me.brandon.ai.ui.Viewport;
 
 import java.awt.*;
 
@@ -22,8 +23,11 @@ public class Tile implements Drawable
 	protected float growthRate;
 	protected float maxGrowth;
 
-	protected Color tileColor;
-	protected Color borderColor;
+	protected Color foodColor;
+	protected Color tileColor = Color.BLACK;
+	protected Color borderColor = Color.WHITE;
+
+	protected double genValue;
 
 	public Tile(int row, int col)
 	{
@@ -42,7 +46,9 @@ public class Tile implements Drawable
 			foodLevel += growthRate;
 		}
 
-		tileColor = Color.getHSBColor(foodType, temperature, foodLevel);
+
+		tileColor = Color.getHSBColor(Math.abs(temperature / 2), 1, foodLevel);
+//		tileColor = Color.getHSBColor(0, (float) 0, (float) genValue);
 	}
 
 	public synchronized float consume(float request)
@@ -54,27 +60,20 @@ public class Tile implements Drawable
 	}
 
 	@Override
-	public boolean isVisible(Rectangle bounds)
+	public void draw(Graphics2D g, Viewport view)
 	{
-		return this.bounds.intersects(bounds);
-	}
-
-	@Override
-	public void draw(Graphics2D g, Rectangle drawBounds)
-	{
-		double scale = World.renderScale;
 
 		Rectangle region = new Rectangle();
-		region.x = (int) ((bounds.x - drawBounds.x) * scale);
-		region.y = (int) ((bounds.y - drawBounds.y) * scale);
-		region.width = (int) (bounds.width * scale);
-		region.height = (int) (bounds.height * scale);
+		region.x = (int) ((bounds.x - view.x) * view.scale);
+		region.y = (int) ((bounds.y - view.y) * view.scale);
+		region.width = (int) (bounds.width * view.scale);
+		region.height = (int) (bounds.height * view.scale);
 
 		g.setColor(tileColor);
 		g.fillRect(region.x, region.y, region.width, region.height);
 
-		g.setColor(borderColor);
-		g.drawRect(region.x, region.y, region.width, region.height);
+//		g.setColor(borderColor);
+//		g.drawRect(region.x + 1, region.y + 1, region.width - 2, region.height - 2);
 
 	}
 }

@@ -42,12 +42,15 @@ public class ThreadManager
 	{
 		for (Thread thread : threads)
 		{
-			try
+			if (thread != null)
 			{
-				thread.join();
-			} catch (InterruptedException e)
-			{
-				e.printStackTrace();
+				try
+				{
+					thread.join();
+				} catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				}
 			}
 		}
 	}

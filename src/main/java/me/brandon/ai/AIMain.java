@@ -5,8 +5,10 @@ import me.brandon.ai.gensim.GeneticSimulator;
 import me.brandon.ai.gensim.ThreadManager;
 import me.brandon.ai.gensim.world.Tile;
 import me.brandon.ai.gensim.world.World;
+import me.brandon.ai.ui.GraphicsPanel;
+import me.brandon.ai.ui.SimulatorUI;
 
-public class AIMain
+public class AIMain implements Runnable
 {
 
 
@@ -20,35 +22,21 @@ public class AIMain
 
 	public AIMain()
 	{
-		Configuration.loadConfigurations(GeneticSimulator.class, ThreadManager.class, World.class, Tile.class);
+		Configuration.loadConfigurations(GeneticSimulator.class, GraphicsPanel.class, ThreadManager.class, World.class, Tile.class);
 
+		ui = new SimulatorUI();
+		simulator = new GeneticSimulator();
+		new Thread(this).start();
 	}
 
+	private SimulatorUI ui;
+	private GeneticSimulator simulator;
 
 	public void run()
 	{
+		simulator.init(ui.getGraphicsPanel());
 
-		//TODO: Render
-
-		threadManager.runParallelTask(() ->
-		{
-			//TODO: collect sensor data
-		});
-
-		threadManager.runParallelTask(() ->
-		{
-			//TODO: compute brain functions
-		});
-
-		threadManager.runParallelTask(() ->
-		{
-			//TODO: update positions
-		});
-
-		threadManager.runParallelTask(() ->
-		{
-			//TODO: breed
-		});
+		simulator.startSimulation();
 
 
 	}
