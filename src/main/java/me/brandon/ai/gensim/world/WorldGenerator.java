@@ -1,5 +1,9 @@
 package me.brandon.ai.gensim.world;
 
+import me.brandon.ai.config.ConfigOption;
+import me.brandon.ai.gensim.GeneticSimulator;
+import me.brandon.ai.util.FractalGenerator;
+
 import java.util.Random;
 
 import static me.brandon.ai.gensim.world.World.worldHeight;
@@ -7,9 +11,9 @@ import static me.brandon.ai.gensim.world.World.worldWidth;
 
 public class WorldGenerator
 {
+	@ConfigOption
+	public static float world_generator_roughness_factor = 0.002f;
 
-	private static double[][] foodType = new double[worldHeight][worldWidth];
-	private static double[][] terrain = new double[worldHeight][worldWidth];
 	private static Random rand = new Random(10);
 
 	public static Tile[][] generateWorld()
@@ -22,75 +26,108 @@ public class WorldGenerator
 			for (int c = 0; c < worldWidth; c++)
 			{
 				worldTiles[r][c] = new Tile(r, c);
-//				values[r][c] = rand.nextGaussian();
-			}
-		}
-
-		initialise(foodType);
-		initialise(terrain);
-
-
-		for (int r = 0; r < worldHeight; r++)
-		{
-			for (int c = 0; c < worldWidth; c++)
-			{
-				if (terrain[r][c] > -0.1)
-				{
-					worldTiles[r][c].foodType = (float) foodType[r][c] + 0.5f;
-					worldTiles[r][c].foodLevel = 1f;
-					worldTiles[r][c].temperature = (float) terrain[r][c] + 0.2f;
-				}
 			}
 		}
 
 		return worldTiles;
 	}
 
-	public static void initialise(double[][] values)
+	public static void generateWorld(World world)
 	{
-		int xh = values.length - 1;
-		int yh = values[0].length - 1;
-
-		// set the corner points
-		values[0][0] = rand.nextFloat() - 0.5f;
-		values[0][yh] = rand.nextFloat() - 0.5f;
-		values[xh][0] = rand.nextFloat() - 0.5f;
-		values[xh][yh] = rand.nextFloat() - 0.5f;
-
-		// generate the fractal
-		generate(values, 0, 0, xh, yh);
-		generate(values, 0, 0, xh, yh);
+		world.setWorldTiles(generateWorld());
 	}
 
-
-	// Add a suitable amount of random displacement to a point
-	private static double roughen(double v, int l, int h)
+	public static void generateTerrain()
 	{
-		return v + 0.005 * (float) (rand.nextGaussian() * (h - l));
+		World world = GeneticSimulator.world();
+		float[][] terrain = FractalGenerator.generateFractal(worldWidth, worldHeight, world_generator_roughness_factor);
+		Tile[][] worldTiles = world.getWorldTiles();
+		scaleMaxMins(terrain);
+		for (int r = 0; r < worldHeight; r++)
+		{
+			for (int c = 0; c < worldWidth; c++)
+			{
+				worldTiles[r][c].temperature = terrain[r][c];
+			}
+		}
+
 	}
 
-	// generate the fractal
-	private static void generate(double[][] values, int xl, int yl, int xh, int yh)
+	public static void generateFoodTypes()
 	{
-		int xm = (xl + xh) / 2;
-		int ym = (yl + yh) / 2;
-		if ((xl == xm) && (yl == ym)) return;
+		World world = GeneticSimulator.world();
+		float[][] foodTypes = FractalGenerator.generateFractal(worldWidth, worldHeight, world_generator_roughness_factor);
+		Tile[][] worldTiles = world.getWorldTiles();
+//		scaleMaxMins(foodTypes);
+		for (int r = 0; r < worldHeight; r++)
+		{
+			for (int c = 0; c < worldWidth; c++)
+			{
+				worldTiles[r][c].foodType = Math.max(-1, Math.min(1f, foodTypes[r][c]));
+			}
+		}
 
-		values[xm][yl] = 0.5 * (values[xl][yl] + values[xh][yl]);
-		values[xm][yh] = 0.5 * (values[xl][yh] + values[xh][yh]);
-		values[xl][ym] = 0.5 * (values[xl][yl] + values[xl][yh]);
-		values[xh][ym] = 0.5 * (values[xh][yl] + values[xh][yh]);
+	}
 
-		double v = roughen(0.5 * (values[xm][yl] + values[xm][yh]), xl + yl, yh + xh);
-		values[xm][ym] = v;
-		values[xm][yl] = roughen(values[xm][yl], xl, xh);
-		values[xm][yh] = roughen(values[xm][yh], xl, xh);
-		values[xl][ym] = roughen(values[xl][ym], yl, yh);
-		values[xh][ym] = roughen(values[xh][ym], yl, yh);
+	public static void scaleMaxMins(float[][] values)
+	{
+		scaleMaxMins(values, 1f, 0);
+	}
 
-		generate(values, xl, yl, xm, ym);
-		generate(values, xm, yl, xh, ym);
-		generate(values, xl, ym, xm, yh);
-		generate(values, xm, ym, xh, yh);
+	public static void scaleMaxMins(float[][] values, float newMax, float newMin)
+	{
+		float min = Float.MAX_VALUE;
+		float max = Float.MIN_VALUE;
+
+		for (int r = 0; r < worldHeight; r++)
+		{
+			for (int c = 0; c < worldWidth; c++)
+			{
+				min = Math.min(min, values[r][c]);
+				max = Math.max(max, values[r][c]);
+			}
+		}
+
+		float range = max - min;
+		float newRange = newMax - newMin;
+
+
+		for (int r = 0; r < worldHeight; r++)
+		{
+			for (int c = 0; c < worldWidth; c++)
+			{
+				values[r][c] = (values[r][c] - min) / range * newRange + newMin;
+			}
+		}
+	}
+
+	public static void generateFoodLevels()
+	{
+		World world = GeneticSimulator.world();
+		float[][] foodTypes = FractalGenerator.generateFractal(worldWidth, worldHeight, world_generator_roughness_factor);
+		Tile[][] worldTiles = world.getWorldTiles();
+		scaleMaxMins(foodTypes, 0.25f, 1.0f);
+		for (int r = 0; r < worldHeight; r++)
+		{
+			for (int c = 0; c < worldWidth; c++)
+			{
+				worldTiles[r][c].foodLevel = Math.max(0.25f, Math.min(1f, foodTypes[r][c]));
+			}
+		}
+	}
+
+	public static void generateWaterBorder()
+	{
+		Tile[][] tiles = GeneticSimulator.world().getWorldTiles();
+
+		for (int r = 0; r < worldHeight; r++)
+		{
+			tiles[r][0].temperature = tiles[r][worldWidth - 1].temperature = -1f;
+		}
+		for (int c = 0; c < worldWidth; c++)
+		{
+			tiles[0][c].temperature = tiles[worldHeight - 1][c].temperature = -1f;
+		}
+
 	}
 }

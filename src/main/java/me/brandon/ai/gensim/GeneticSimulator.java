@@ -2,7 +2,7 @@ package me.brandon.ai.gensim;
 
 import me.brandon.ai.ui.GraphicsPanel;
 import me.brandon.ai.config.ConfigOption;
-import me.brandon.ai.gensim.world.Creature;
+import me.brandon.ai.gensim.world.creature.Creature;
 import me.brandon.ai.ui.Drawable;
 import me.brandon.ai.gensim.world.World;
 import me.brandon.ai.ui.Viewport;
@@ -15,6 +15,14 @@ import java.util.concurrent.Semaphore;
 public class GeneticSimulator implements Drawable, Runnable
 {
 
+	public static GeneticSimulator instance;
+
+	public static World world()
+	{
+		return instance.world;
+	}
+
+
 	@ConfigOption
 	public static int thread_chunk_size_min = 10;
 
@@ -24,6 +32,8 @@ public class GeneticSimulator implements Drawable, Runnable
 	public static float ticksPerSecond = 30.0f;
 
 	protected World world;
+
+	Semaphore sem = new Semaphore(1);
 
 	private ThreadManager threadManager;
 	private Thread thread;
@@ -40,6 +50,7 @@ public class GeneticSimulator implements Drawable, Runnable
 
 	public GeneticSimulator()
 	{
+		instance = this;
 		threadManager = new ThreadManager();
 		threadManager.init();
 	}
@@ -48,8 +59,21 @@ public class GeneticSimulator implements Drawable, Runnable
 	{
 		this.graphicsPanel = graphicsPanel;
 
-		world = new World();
+		world = new World(this);
 		world.generateWorld();
+	}
+
+	public void addCreature(Creature creature)
+	{
+		try
+		{
+			sem.acquire();
+			world.addCreature(creature);
+			sem.release();
+		} catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	public void startSimulation()
@@ -76,6 +100,7 @@ public class GeneticSimulator implements Drawable, Runnable
 	public void run()
 	{
 
+
 		lastTickTime = System.currentTimeMillis();
 		while (running)
 		{
@@ -83,12 +108,14 @@ public class GeneticSimulator implements Drawable, Runnable
 			actualTickRate = 1000 / (tickTime - lastTickTime + 1);
 			lastTickTime = tickTime;
 
-			graphicsPanel.draw(this);
+			time++;
+
+			if (updateRendering)
+				graphicsPanel.draw(this);
 
 			List<Creature> creatures = world.getCreatures();
 			remainingSize = creatures.size();
 
-			Semaphore sem = new Semaphore(1);
 
 			threadManager.runParallelTask(() ->
 			{
@@ -106,7 +133,7 @@ public class GeneticSimulator implements Drawable, Runnable
 							chunkSize = Math.max(remainingSize / (ThreadManager.NUM_THREADS * 2), thread_chunk_size_min);
 							chunkSize = Math.min(remainingSize, chunkSize);
 
-							remainingSize += chunkSize;
+							remainingSize -= chunkSize;
 						}
 						sem.release();
 
@@ -128,6 +155,7 @@ public class GeneticSimulator implements Drawable, Runnable
 			});
 
 			threadManager.waitForAll();
+			remainingSize = creatures.size();
 
 			threadManager.runParallelTask(() ->
 			{
@@ -144,7 +172,7 @@ public class GeneticSimulator implements Drawable, Runnable
 							chunkSize = Math.max(remainingSize / (ThreadManager.NUM_THREADS * 2), thread_chunk_size_min);
 							chunkSize = Math.min(remainingSize, chunkSize);
 
-							remainingSize += chunkSize;
+							remainingSize -= chunkSize;
 						}
 						sem.release();
 
@@ -163,6 +191,7 @@ public class GeneticSimulator implements Drawable, Runnable
 			});
 
 			threadManager.waitForAll();
+			remainingSize = creatures.size();
 
 			threadManager.runParallelTask(() ->
 			{
@@ -179,7 +208,7 @@ public class GeneticSimulator implements Drawable, Runnable
 							chunkSize = Math.max(remainingSize / (ThreadManager.NUM_THREADS * 2), thread_chunk_size_min);
 							chunkSize = Math.min(remainingSize, chunkSize);
 
-							remainingSize += chunkSize;
+							remainingSize -= chunkSize;
 						}
 						sem.release();
 
@@ -229,5 +258,10 @@ public class GeneticSimulator implements Drawable, Runnable
 		{
 			graphicsPanel.draw(world);
 		}
+	}
+
+	public World getWorld()
+	{
+		return world;
 	}
 }

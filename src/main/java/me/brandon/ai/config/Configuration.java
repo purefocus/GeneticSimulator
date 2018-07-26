@@ -1,9 +1,5 @@
 package me.brandon.ai.config;
 
-import me.brandon.ai.gensim.world.Creature;
-import me.brandon.ai.gensim.world.Tile;
-import me.brandon.ai.gensim.world.World;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

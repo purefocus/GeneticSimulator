@@ -26,7 +26,16 @@ public class ThreadManager
 	{
 		for (int i = 0; i < threads.length; i++)
 		{
-			threads[i] = new Thread(runnable);
+			threads[i] = new Thread(() ->
+			{
+				try
+				{
+					runnable.run();
+				} catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			});
 		}
 
 		for (Thread thread : threads)
@@ -34,7 +43,14 @@ public class ThreadManager
 			thread.start();
 		}
 
-		runnable.run();
+		try
+		{
+			runnable.run();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 
 	}
 
