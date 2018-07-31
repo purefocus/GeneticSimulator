@@ -1,9 +1,11 @@
 package me.brandon.ai.ui;
 
+import me.brandon.ai.AIMain;
 import me.brandon.ai.config.ConfigOption;
 import me.brandon.ai.config.WorldSave;
 import me.brandon.ai.gensim.GeneticSimulator;
 import me.brandon.ai.gensim.world.World;
+import me.brandon.ai.gensim.world.creature.Creature;
 
 import javax.swing.*;
 import java.awt.*;
@@ -84,7 +86,7 @@ public class GraphicsPanel extends Canvas implements MouseListener, MouseWheelLi
 
 	}
 
-	private void render()
+	public void render()
 	{
 		// TODO Auto-generated method stub
 		BufferStrategy bs = this.getBufferStrategy();
@@ -97,17 +99,26 @@ public class GraphicsPanel extends Canvas implements MouseListener, MouseWheelLi
 
 		Graphics g = bs.getDrawGraphics();
 		//////////////////////////////
-		if (display != null)
+
+		g.setColor(Color.DARK_GRAY);
+		g.fillRect(0, 0, getWidth(), getHeight());
+		if (display != null && GeneticSimulator.updateRendering)
 		{
 			g.drawImage(display, 0, 0, getWidth(), getHeight(), this);
 		}
 
+		World world = GeneticSimulator.world();
+
+		world.draw((Graphics2D) g, view);
+
 		g.setColor(Color.WHITE);
-		g.drawString(String.format("view: [%2.1f, %2.1f, %2.1f, %2.1f, %2.2f]", view.x, view.y, view.width, view.height, view.PxToWorldScale), (int) 10, (int) 30);
+		g.drawString(String.format("view: [%2.1f, %2.1f, %2.1f, %2.1f, %2.2f]", view.x, view.y, view.width, view.height, view.PxToWorldScale), (int) 10, (int) 15);
 		if (mouseLocation != null)
 		{
-			g.drawString(String.format("mouse: [%d, %d]", mouseLocation.x, mouseLocation.y), (int) 10, (int) 55);
+			g.drawString(String.format("mouse: [%d, %d]", mouseLocation.x, mouseLocation.y), (int) 10, (int) 15);
 		}
+
+		g.drawString(String.format("world: [time: %2.2f pop: %d]", world.getTime() / 100f, world.getPopulationCount()), 10, 30);
 
 		g.drawRect(view.pixelX, view.pixelY, view.pixelWidth, view.pixelHeight);
 //		p.render(g);
@@ -157,7 +168,15 @@ public class GraphicsPanel extends Canvas implements MouseListener, MouseWheelLi
 	@Override
 	public void mouseClicked(MouseEvent e)
 	{
+		World world = GeneticSimulator.world();
+		Point p = world.view.PxToWorld(e.getX(), e.getY());
 
+		Creature c = world.getCreatureAtPosition(p.x, p.y);
+		if (c != null)
+		{
+			World.selectedCreature = c;
+			AIMain.renderCreatureData();
+		}
 	}
 
 	@Override
@@ -212,6 +231,14 @@ public class GraphicsPanel extends Canvas implements MouseListener, MouseWheelLi
 			World world = GeneticSimulator.instance.getWorld();
 			world.generateWorld();
 		}
+		else if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_P)
+		{
+			GeneticSimulator.instance.stopSimulation();
+		}
+		else if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_R)
+		{
+			GeneticSimulator.instance.startSimulation();
+		}
 	}
 
 	@Override
@@ -232,17 +259,19 @@ public class GraphicsPanel extends Canvas implements MouseListener, MouseWheelLi
 //			zoom = 0.01f;
 //		}
 
-		view.PxToWorldScale -= zoom;
+		view.PxToWorldScale += zoom;
 
 		view.width = getWidth() * view.PxToWorldScale;
 		view.height = getHeight() * view.PxToWorldScale;
 
 
-		view.x += mx * zoom;
-		view.y += my * zoom;
+		view.x -= mx * zoom;
+		view.y -= my * zoom;
 
 
 		view.ensureOnScreen();
+
+		render();
 
 	}
 
@@ -261,6 +290,7 @@ public class GraphicsPanel extends Canvas implements MouseListener, MouseWheelLi
 		mouseLocation = e.getPoint();
 		view.ensureOnScreen();
 
+		render();
 	}
 
 	@Override

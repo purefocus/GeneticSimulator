@@ -1,5 +1,6 @@
 package me.brandon.ai.gensim;
 
+import me.brandon.ai.AIMain;
 import me.brandon.ai.ui.GraphicsPanel;
 import me.brandon.ai.config.ConfigOption;
 import me.brandon.ai.gensim.world.creature.Creature;
@@ -40,7 +41,7 @@ public class GeneticSimulator implements Drawable, Runnable
 
 	private int time;
 
-	private GraphicsPanel graphicsPanel;
+	public static GraphicsPanel graphicsPanel;
 
 	private float actualTickRate;
 
@@ -110,8 +111,7 @@ public class GeneticSimulator implements Drawable, Runnable
 
 			time++;
 
-			if (updateRendering)
-				graphicsPanel.draw(this);
+			graphicsPanel.render();
 
 			List<Creature> creatures = world.getCreatures();
 			remainingSize = creatures.size();
@@ -258,6 +258,8 @@ public class GeneticSimulator implements Drawable, Runnable
 		{
 			graphicsPanel.draw(world);
 		}
+
+		AIMain.renderCreatureData();
 	}
 
 	public World getWorld()

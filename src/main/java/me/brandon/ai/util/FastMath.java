@@ -38,7 +38,7 @@ public class FastMath
 
 	private static float sinLookup(int angle)
 	{
-		return angle >= 0 ? sinTable[angle % modulus] : -sinTable[angle % modulus];
+		return angle >= 0 ? sinTable[angle % modulus] : -sinTable[Math.abs(angle % modulus)];
 	}
 
 	public static float sin(float angle)
@@ -108,6 +108,24 @@ public class FastMath
 		int yi = (int) (y * invDiv);
 
 		return (atan2[yi * ATAN2_DIM + xi] + add) * mul;
+	}
+
+
+	public static double exp(double val)
+	{
+		final long tmp = (long) (1512775 * val + 1072632447);
+		return Double.longBitsToDouble(tmp << 32);
+	}
+
+	public static double log(double x)
+	{
+		return 6 * (x - 1) / (x + 1 + 4 * (Math.sqrt(x)));
+	}
+
+	public static double pow(double a, double b)
+	{
+		long tmp = (long) (9076650 * (a - 1) / (a + 1 + 4 * (Math.sqrt(a))) * b + 1072632447);
+		return Double.longBitsToDouble(tmp << 32);
 	}
 
 

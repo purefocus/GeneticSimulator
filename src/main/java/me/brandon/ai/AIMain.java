@@ -8,8 +8,13 @@ import me.brandon.ai.gensim.world.creature.Creature;
 import me.brandon.ai.gensim.world.Tile;
 import me.brandon.ai.gensim.world.World;
 import me.brandon.ai.gensim.world.WorldGenerator;
+import me.brandon.ai.gensim.world.creature.CreatureBrain;
+import me.brandon.ai.ui.CreatureDataPanel;
 import me.brandon.ai.ui.GraphicsPanel;
 import me.brandon.ai.ui.SimulatorUI;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class AIMain implements Runnable
 {
@@ -17,8 +22,7 @@ public class AIMain implements Runnable
 
 	public static void main(String[] args)
 	{
-		new AIMain().run();
-
+		new AIMain();
 	}
 
 	private ThreadManager threadManager;
@@ -30,6 +34,19 @@ public class AIMain implements Runnable
 		ui = new SimulatorUI();
 		simulator = new GeneticSimulator();
 		new Thread(this).start();
+
+
+		JFrame frame = new JFrame();
+		frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		JPanel conentPane = new JPanel();
+		conentPane.add(graphics = new CreatureDataPanel());
+		frame.setContentPane(conentPane);
+		frame.pack();
+		frame.setVisible(true);
+
+		graphics.render();
+
+
 	}
 
 	private SimulatorUI ui;
@@ -47,5 +64,19 @@ public class AIMain implements Runnable
 
 
 	}
+
+	private static CreatureDataPanel graphics;
+
+	public static void renderCreatureData()
+	{
+		try
+		{
+			graphics.render();
+		} catch (Exception e)
+		{
+
+		}
+	}
+
 
 }

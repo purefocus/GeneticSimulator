@@ -42,6 +42,22 @@ public class SimulatorUI extends JFrame implements ActionListener
 
 		setJMenuBar(menuBar);
 
+		JToolBar tb = new JToolBar();
+		contentPane.add(tb, BorderLayout.NORTH);
+		((JButton) tb.add(new JButton("Render World"))).addActionListener(e ->
+		{
+			GeneticSimulator.updateRendering = !GeneticSimulator.updateRendering;
+		});
+		((JButton) tb.add(new JButton("Slow down"))).addActionListener(e ->
+		{
+			GeneticSimulator.ticksPerSecond -= 5;
+		});
+
+		((JSlider) tb.add(new JSlider(1, 1000, 20))).addChangeListener(e ->
+		{
+			GeneticSimulator.ticksPerSecond = ((JSlider) e.getSource()).getValue();
+		});
+
 
 		setContentPane(contentPane);
 	}

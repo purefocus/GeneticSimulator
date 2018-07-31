@@ -124,6 +124,11 @@ public class Viewport
 		return new Point((int) ((wx - x) / PxToWorldScale), (int) ((wy - y) / PxToWorldScale));
 	}
 
+	public Point PxToWorld(double px, double py)
+	{
+		return new Point((int) (px * PxToWorldScale + x), (int) (py * PxToWorldScale + y));
+	}
+
 	public Rectangle getPxBounds()
 	{
 		return pxBounds;

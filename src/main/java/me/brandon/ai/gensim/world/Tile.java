@@ -11,8 +11,7 @@ import java.awt.*;
 public class Tile implements Drawable
 {
 	@ConfigOption
-	public static float tile_maxFood = 100f;
-
+	public static float tile_maxFood = 0.5f;
 
 	public static double borderSize = 0;
 
@@ -25,14 +24,16 @@ public class Tile implements Drawable
 	protected float temperature; // saturation
 	protected float foodType; // hue
 
-	protected float growthRate;
-	protected float maxGrowth;
+	protected float growthRate = 0.00001f;
+	protected float maxGrowth = tile_maxFood;
 
+	boolean isWater = false;
 	protected Color foodColor;
 	protected Color tileColor = Color.BLACK;
 	protected Color borderColor = Color.WHITE;
 
 	protected double genValue;
+	public boolean updating;
 
 	public Tile(int row, int col)
 	{
@@ -50,6 +51,24 @@ public class Tile implements Drawable
 		this.temperature = temperature;
 		this.foodLevel = foodLevel;
 		this.foodType = foodType;
+		isWater = temperature < waterLevel;
+		if (isWater)
+		{
+			this.foodLevel = 0;
+			this.temperature = 0;
+			this.foodType = 0;
+			isWater = true;
+		}
+		else
+		{
+			maxGrowth = this.foodLevel;
+			growthRate = 0.01f * this.maxGrowth;
+		}
+	}
+
+	public boolean isWater()
+	{
+		return isWater;
 	}
 
 	public void tick(int time)
@@ -57,11 +76,16 @@ public class Tile implements Drawable
 		if (foodLevel < maxGrowth)
 		{
 			foodLevel += growthRate;
+			foodLevel = Math.min(maxGrowth, foodLevel);
+		}
+		else
+		{
+			updating = false;
 		}
 
 		tileColor = Color.getHSBColor(
 				foodType,
-				temperature >= waterLevel ? Math.max(foodLevel, 0) : 0,
+				temperature >= waterLevel ? Math.max(foodLevel, 0.1f) : 0,
 				temperature >= waterLevel ? temperature : 0
 		);
 
@@ -76,7 +100,14 @@ public class Tile implements Drawable
 
 	public synchronized float consume(float request)
 	{
-		float consumed = Math.max(request, foodLevel);
+		if (request > 0 && !updating)
+		{
+			updating = true;
+			World.setUpdating(this);
+		}
+		if (request < 0)
+			return 0;
+		float consumed = Math.min(request, foodLevel);
 		foodLevel -= consumed;
 
 		return consumed;
@@ -94,6 +125,7 @@ public class Tile implements Drawable
 
 
 //		g.setColor(borderColor);
+
 		g.setColor(tileColor);
 		g.fillRect(region.x, region.y, region.width + 1, region.height + 1);
 
