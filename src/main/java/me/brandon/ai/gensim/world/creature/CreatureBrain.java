@@ -202,7 +202,7 @@ public class CreatureBrain
 	public void setInput()
 	{
 
-		// copy memory outputs to inputs
+		// fullCopy memory outputs to inputs
 		for (int i = 0; i < creature.numMemory; i++)
 		{
 			neurons[i].value = neurons[inputNodeSize + i].value;
