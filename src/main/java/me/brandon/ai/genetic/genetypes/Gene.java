@@ -3,8 +3,6 @@ package me.brandon.ai.genetic.genetypes;
 import me.brandon.ai.genetic.Mutator;
 
 import static me.brandon.ai.genetic.Genetic.chance;
-import static me.brandon.ai.genetic.Genetic.randMax;
-import static me.brandon.ai.genetic.Genetic.randVal;
 
 public abstract class Gene<T extends Gene<T>> implements Comparable<Gene<?>>
 {
@@ -50,6 +48,9 @@ public abstract class Gene<T extends Gene<T>> implements Comparable<Gene<?>>
 	 */
 	protected Mutator<T> mutator;
 
+	/**
+	 * Can this trait cross with any trait of the same type?
+	 */
 	protected boolean machAnyOfType;
 
 	/**
@@ -91,14 +92,17 @@ public abstract class Gene<T extends Gene<T>> implements Comparable<Gene<?>>
 		this.machAnyOfType = matchAnyOfType;
 	}
 
-	public Gene<T> makeChild(T otherParent)
+	/**
+	 * Creates a new gene that is the child between two parents
+	 */
+	public <M extends T> M makeChild(T otherParent)
 	{
-		Gene<T> child = createClone();
+		T child = createClone();
 		if (otherParent != null)
 		{
 			child.cross(otherParent);
 		}
-		return child;
+		return (M) child;
 	}
 
 	/**
@@ -235,6 +239,11 @@ public abstract class Gene<T extends Gene<T>> implements Comparable<Gene<?>>
 		// fullCopy other values for the specific gene
 		copy(other);
 	}
+
+	/**
+	 * Attempts to get the value stored in the gene
+	 */
+	public abstract Object get();
 
 	/**
 	 * Creates a new object that is an exact fullCopy of the gene

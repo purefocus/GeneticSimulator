@@ -1,13 +1,10 @@
 package me.brandon.ai.genetic;
 
-import me.brandon.ai.genetic.genetypes.Gene;
+import me.brandon.ai.genetic.genetypes.GeneList;
 
-import java.util.List;
-
-public class Genome
+public class Genome<T>
 {
-
-	private List<Gene> genes;
+	private GeneList dna;
 
 
 }

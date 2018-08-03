@@ -8,36 +8,35 @@ import java.util.List;
 import static me.brandon.ai.genetic.Genetic.chance;
 import static me.brandon.ai.genetic.Genetic.weightedChance;
 
-public class GeneList extends Gene<GeneList>
+public class GeneList<T extends Gene<T>> extends Gene<GeneList<T>>
 {
-	private List<Gene<? extends Gene>> geneList;
+	private List<T> geneList;
 
 	public GeneList()
 	{
 		this(1.0f, null);
 	}
 
-	public GeneList(float mutRate, Mutator<GeneList> mutator)
+	public GeneList(float mutRate, Mutator<GeneList<T>> mutator)
 	{
 		super(mutRate, mutator);
 		this.geneList = new ArrayList<>();
 	}
 
 	@Override
-	public GeneList cross(GeneList other)
+	public GeneList<T> cross(GeneList<T> other)
 	{
-		GeneList list = createClone();
 		int s1 = geneList.size();
 		int s2 = other.geneList.size();
 
-		Gene<?> a = null;
-		Gene<?> b = null;
+		T a = null;
+		T b = null;
 		for (int i = 0, j = 0; i < s1 || j < s2; )
 		{
 			if (a == null && i < s1)
-				a = list.geneList.get(i);
+				a = geneList.get(i);
 			if (b == null && j < s2)
-				b = list.geneList.get(j);
+				b = geneList.get(j);
 
 			if (a != null && b != null)
 			{
@@ -95,9 +94,14 @@ public class GeneList extends Gene<GeneList>
 	}
 
 	@Override
-	public GeneList generateRandom()
+	public GeneList<T> generateRandom()
 	{
-		return new GeneList();
+		GeneList<T> list = new GeneList<>();
+		for (Gene<T> gene : geneList)
+		{
+			list.addGene(gene.generateRandom());
+		}
+		return list;
 	}
 
 	@Override
@@ -123,7 +127,7 @@ public class GeneList extends Gene<GeneList>
 		geneList.forEach(Gene::attemptMutate);
 	}
 
-	public Gene<?> addGene(Gene<?> gene)
+	public T addGene(T gene)
 	{
 		geneList.add(gene);
 		return gene;
@@ -140,16 +144,15 @@ public class GeneList extends Gene<GeneList>
 	}
 
 	@Override
-	protected void copy(GeneList other)
+	protected void copy(GeneList<T> other)
 	{
 		geneList = new ArrayList<>();
 		other.geneList.forEach(gene -> geneList.add(gene.createClone()));
 	}
 
-
-	public List<Gene<?>> getGeneList()
+	@Override
+	public Object get()
 	{
 		return geneList;
 	}
-
 }

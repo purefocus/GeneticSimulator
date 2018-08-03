@@ -26,15 +26,16 @@ public class NumericGene extends Gene<NumericGene>
 	public NumericGene cross(NumericGene other)
 	{
 		value = (value * dominance + other.value * other.dominance) / (dominance + other.dominance);
-		attemptMutate();
 		return this;
 	}
 
 	@Override
 	public NumericGene generateRandom()
 	{
-		value = randVal(max, min);
-		return this;
+		NumericGene gene = createClone();
+		gene.value = randVal(max, min);
+		this.dominance = 1f;
+		return gene;
 	}
 
 	@Override
@@ -47,6 +48,7 @@ public class NumericGene extends Gene<NumericGene>
 	public void mutate()
 	{
 		value += randVal(mutAmount);
+		value = Math.max(min, Math.min(max, value));
 	}
 
 	@Override
@@ -56,6 +58,12 @@ public class NumericGene extends Gene<NumericGene>
 		this.min = other.min;
 		this.mutAmount = other.mutAmount;
 		this.value = other.value;
+	}
+
+	@Override
+	public Object get()
+	{
+		return value;
 	}
 
 	public float getValue()

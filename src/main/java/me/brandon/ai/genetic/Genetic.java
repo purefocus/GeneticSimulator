@@ -5,7 +5,7 @@ import java.util.Random;
 public class Genetic
 {
 
-	public static Random rand;
+	public static Random rand = new Random(10);
 
 	public static float randVal(float max, float min)
 	{
