@@ -1,13 +1,9 @@
 package me.brandon.ai.util;
 
-import me.brandon.ai.config.ConfigOption;
-import me.brandon.ai.gensim.world.Tile;
-import me.brandon.ai.gensim.world.World;
-
 import java.util.Random;
 
-import static me.brandon.ai.gensim.world.World.worldHeight;
-import static me.brandon.ai.gensim.world.World.worldWidth;
+import static me.brandon.ai.evolve.world.World.worldHeight;
+import static me.brandon.ai.evolve.world.World.worldWidth;
 
 public class FractalGenerator
 {

@@ -1,7 +1,7 @@
 package me.brandon.ai.ui;
 
 import me.brandon.ai.config.WorldSave;
-import me.brandon.ai.gensim.GeneticSimulator;
+import me.brandon.ai.evolve.GeneticSimulator;
 
 import javax.swing.*;
 import java.awt.*;

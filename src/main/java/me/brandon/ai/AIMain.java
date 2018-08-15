@@ -2,19 +2,17 @@ package me.brandon.ai;
 
 import me.brandon.ai.config.Configuration;
 import me.brandon.ai.config.WorldSave;
-import me.brandon.ai.gensim.GeneticSimulator;
-import me.brandon.ai.gensim.ThreadManager;
-import me.brandon.ai.gensim.world.creature.Creature;
-import me.brandon.ai.gensim.world.Tile;
-import me.brandon.ai.gensim.world.World;
-import me.brandon.ai.gensim.world.WorldGenerator;
-import me.brandon.ai.gensim.world.creature.CreatureBrain;
+import me.brandon.ai.evolve.GeneticSimulator;
+import me.brandon.ai.evolve.ThreadManager;
+import me.brandon.ai.evolve.world.creature.Creature;
+import me.brandon.ai.evolve.world.Tile;
+import me.brandon.ai.evolve.world.World;
+import me.brandon.ai.evolve.world.WorldGenerator;
 import me.brandon.ai.ui.CreatureDataPanel;
 import me.brandon.ai.ui.GraphicsPanel;
 import me.brandon.ai.ui.SimulatorUI;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class AIMain implements Runnable
 {

@@ -1,7 +1,7 @@
 package me.brandon.ai.genetic.genetypes;
 
-import static me.brandon.ai.genetic.Genetic.randVal;
-import static me.brandon.ai.genetic.Genetic.weightedChance;
+import static me.brandon.ai.genetic.Chance.randVal;
+import static me.brandon.ai.genetic.Chance.weightedChance;
 
 public class NameGene extends Gene<NameGene>
 {

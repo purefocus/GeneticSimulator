@@ -3,11 +3,10 @@ package me.brandon.ai.ui;
 import me.brandon.ai.AIMain;
 import me.brandon.ai.config.ConfigOption;
 import me.brandon.ai.config.WorldSave;
-import me.brandon.ai.gensim.GeneticSimulator;
-import me.brandon.ai.gensim.world.World;
-import me.brandon.ai.gensim.world.creature.Creature;
+import me.brandon.ai.evolve.GeneticSimulator;
+import me.brandon.ai.evolve.world.World;
+import me.brandon.ai.evolve.world.creature.Creature;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferStrategy;

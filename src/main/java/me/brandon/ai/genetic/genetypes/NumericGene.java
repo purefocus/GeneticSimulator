@@ -1,6 +1,6 @@
 package me.brandon.ai.genetic.genetypes;
 
-import static me.brandon.ai.genetic.Genetic.*;
+import static me.brandon.ai.genetic.Chance.*;
 
 public class NumericGene extends Gene<NumericGene>
 {

@@ -1,6 +1,9 @@
 package me.brandon.ai.neural.impl;
 
+import me.brandon.ai.genetic.Chance;
+import me.brandon.ai.genetic.genetypes.Gene;
 import me.brandon.ai.neural.Network;
+import me.brandon.ai.neural.NetworkFactory;
 import me.brandon.ai.neural.Neuron;
 import me.brandon.ai.neural.util.NetworkRenderer;
 
@@ -8,7 +11,7 @@ import java.awt.*;
 
 // TODO: Add options for network training
 
-public class NNetwork implements Network
+public class NNetwork extends Gene<NNetwork> implements Network
 {
 
 	private float output[];
@@ -20,22 +23,26 @@ public class NNetwork implements Network
 	private int outputCount;
 	private int outputLayer;
 
+	public NNetwork()
+	{
+		super(1.0f);
+	}
+
 
 	@Override
 	public void setInput(float... inputs)
 	{
-
 		for (int i = 0; i < inputCount; i++)
 		{
 			network[0][i].setValue(inputs[i]);
 		}
-
 	}
 
 	@Override
 	public void compute()
 	{
 		reset = false;
+		reset();
 		for (int i = 0; i < outputCount; i++)
 		{
 			Neuron neuron = network[outputLayer][i];
@@ -95,9 +102,9 @@ public class NNetwork implements Network
 		this.output = new float[outputCount];
 	}
 
-	public Neuron[][] getNetwork()
+	public <T extends Neuron> T[][] getNetwork()
 	{
-		return network;
+		return (T[][]) network;
 	}
 
 	public int getLayerCount()
@@ -133,5 +140,111 @@ public class NNetwork implements Network
 		g.drawImage(renderer.render(width, height), 0, 0, width, height, null);
 
 	}
+
+	@Override
+	public NNetwork cross(NNetwork other)
+	{
+		for (int i = 0; i < network.length; i++)
+		{
+			for (int j = 0; j < network[i].length; j++)
+			{
+				NNeuron o = other.network[i][j];
+				NNeuron n = network[i][j];
+				for (int k = 0; k < n.inputs.length; k++)
+				{
+					NConnection i1 = o.inputs[k];
+					NConnection i2 = n.inputs[k];
+
+					if (dominance == other.dominance)
+					{
+						i2.weight = (i2.weight + i1.weight) / 2;
+					}
+					else
+					{
+						i2.weight = (i2.weight * dominance + i1.weight * other.dominance) / (dominance + other.dominance);
+					}
+
+				}
+			}
+		}
+		attemptMutate();
+		return this;
+	}
+
+	@Override
+	public NNetwork generateRandom()
+	{
+		return null;
+	}
+
+	@Override
+	public float geneticDistance(NNetwork other)
+	{
+		return 0;
+	}
+
+	@Override
+	public void mutate()
+	{
+		for (int i = 0; i < network.length; i++)
+		{
+			for (int j = 0; j < network[i].length; j++)
+			{
+				for (int k = 0; k < network[i][j].inputs.length; k++)
+				{
+					network[i][j].inputs[k].weight += Chance.randVal(0.1f);
+					if (Chance.rand() < 0.25)
+					{
+						network[i][j].inputs[k].weight += Chance.randVal(0.5f);
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	protected void copy(NNetwork other)
+	{
+		network = ((NNetwork) NetworkFactory.buildFromExisting(other)).getNetwork();
+
+		inputCount = other.inputCount;
+		outputCount = other.outputCount;
+		outputLayer = other.outputLayer;
+		output = new float[outputCount];
+		reset();
+
+	}
+
+	@Override
+	public Object get()
+	{
+		return this;
+	}
+
+	public void forEachNeuron(NetworkIteration<NNeuron> iter)
+	{
+		for (int layer = 0; layer < network.length; layer++)
+		{
+			int layerSize = network[layer].length;
+			for (int index = 0; index < layerSize; index++)
+			{
+				iter.item(layer, index, network[layer][index]);
+			}
+		}
+	}
+
+	public void forEachLayer(NetworkIteration<NNeuron[]> iter)
+	{
+		for (int layer = 0; layer < network.length; layer++)
+		{
+			iter.item(layer, 0, network[layer]);
+		}
+	}
+
+	public interface NetworkIteration<T>
+	{
+		void item(int layer, int index, T neuron);
+	}
+
 
 }

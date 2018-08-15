@@ -21,6 +21,16 @@ public class NetworkFactory
 		return new NetworkFactory();
 	}
 
+	public static NetworkFactory createFromExisting(NNetwork network)
+	{
+		return createFactory().fromExisting(network);
+	}
+
+	public static <T extends Network> T buildFromExisting(NNetwork network)
+	{
+		return createFactory().fromExisting(network).build();
+	}
+
 	private int _nId;
 
 	private List<List<FactoryNeuron>> layers;
@@ -38,7 +48,7 @@ public class NetworkFactory
 	 *
 	 * @return the network
 	 */
-	public Network build()
+	public <T extends Network> T build()
 	{
 		NNeuron neuronNetwork[][] = new NNeuron[layers.size()][];
 		for (int i = 0; i < layers.size(); i++)
@@ -54,7 +64,7 @@ public class NetworkFactory
 		NNetwork network = new NNetwork();
 		network.setNeuronNetwork(neuronNetwork);
 
-		return network;
+		return (T) network;
 	}
 
 	/**
@@ -68,7 +78,7 @@ public class NetworkFactory
 		List<FactoryNeuron> layer = new ArrayList<>();
 		for (int i = 0; i < inputSize; i++)
 		{
-			layer.add(new FactoryNeuron(new InputNeuron(), lc));
+			layer.add(new FactoryNeuron(new InputNeuron(), lc, i));
 		}
 		layers.add(layer);
 		return this;
@@ -86,7 +96,7 @@ public class NetworkFactory
 		List<FactoryNeuron> layer = new ArrayList<>(outputSize);
 		for (int i = 0; i < outputSize; i++)
 		{
-			layer.add(new FactoryNeuron(new OutputNeuron(), lc));
+			layer.add(new FactoryNeuron(new OutputNeuron(), lc, i));
 		}
 		layers.add(layer);
 		return this;
@@ -103,7 +113,7 @@ public class NetworkFactory
 		List<FactoryNeuron> layer = new ArrayList<>(layerSize);
 		for (int i = 0; i < layerSize; i++)
 		{
-			layer.add(new FactoryNeuron(makeNewNeuron(NeuronType.Hidden), lc));
+			layer.add(new FactoryNeuron(makeNewNeuron(NeuronType.Hidden), lc, i));
 		}
 		layers.add(layer);
 		return this;
@@ -117,7 +127,7 @@ public class NetworkFactory
 	 */
 	public NetworkFactory addNeuron(NNeuron neuron, int layer)
 	{
-		layers.get(layer).add(new FactoryNeuron(neuron, layer));
+		layers.get(layer).add(new FactoryNeuron(neuron, layer, layers.size()));
 		return this;
 	}
 
@@ -394,12 +404,61 @@ public class NetworkFactory
 		return new NNeuron(type);
 	}
 
-	public NetworkFactory fromExisting(NNetwork network)
+	private NNeuron fromNeuron(NNeuron n)
+	{
+		try
+		{
+			NNeuron neuron = n.getClass().newInstance();
+			neuron.setType(n.type());
+
+			return neuron;
+
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		return new NNeuron();
+	}
+
+	public NetworkFactory fromExisting(NNetwork net)
 	{
 
-		//TODO: load factory values from an existing network
+		net.forEachLayer((lay, ignore, neurons) ->
+		{
+			// add neurons to network
+			List<FactoryNeuron> layer = getLayer(lay);
+			for (int i = 0; i < neurons.length; i++)
+			{
+				NNeuron n = neurons[i];
+				FactoryNeuron newNeuron = new FactoryNeuron(fromNeuron(n), lay, i);
+				layer.add(newNeuron);
+
+				NConnection[] cons = n.getInputs();
+				for (NConnection con : cons)
+				{
+					FactoryNeuron from = getNeuron(con.sourceLayer(), con.sourceIndex());
+					new FactoryConnection(from, newNeuron, con.weight());
+				}
+			}
+
+		});
 
 		return this;
+	}
+
+	private FactoryNeuron getNeuron(int layer, int index)
+	{
+		return layers.get(layer).get(index);
+	}
+
+	private List<FactoryNeuron> getLayer(int layer)
+	{
+		while (layers.size() <= layer)
+		{
+			layers.add(new ArrayList<>());
+		}
+		return layers.get(layer);
 	}
 
 	public NetworkFactory weightRandomizer()
@@ -419,19 +478,23 @@ public class NetworkFactory
 		List<FactoryConnection> outputs;
 
 
-		FactoryNeuron(NeuronType type, int layer)
+		FactoryNeuron(NeuronType type, int layer, int index)
 		{
 			this(layer);
 			this.type = type;
 
 			this.neuron = makeNewNeuron(type);
+			this.neuron.layer = layer;
+			this.neuron.setIndex(index);
 		}
 
-		FactoryNeuron(NNeuron neuron, int layer)
+		FactoryNeuron(NNeuron neuron, int layer, int index)
 		{
 			this(layer);
 			this.type = neuron.type();
 			this.neuron = neuron;
+			this.neuron.layer = layer;
+			this.neuron.setIndex(index);
 		}
 
 		FactoryNeuron(int layer)

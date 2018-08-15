@@ -5,7 +5,7 @@ public interface Connection
 
 	float weight();
 
-	Neuron source();
+	<T extends Neuron> T source();
 
 	float compute();
 

@@ -3,6 +3,12 @@ package me.brandon.ai.util;
 public class Vector
 {
 
+
+	public static Vector zero()
+	{
+		return new Vector(0, 0);
+	}
+
 	public static Vector vector(double x, double y)
 	{
 		return new Vector(x, y);
@@ -11,6 +17,11 @@ public class Vector
 	public static Vector fromAngle(double angle, double mag)
 	{
 		return new Vector(angle).scale(mag);
+	}
+
+	public static Vector fromAngle(double angle)
+	{
+		return new Vector(angle);
 	}
 
 	public double x;
@@ -23,8 +34,8 @@ public class Vector
 
 	public Vector(double angle)
 	{
-		this.x = FastMath.cos((float) angle);
-		this.y = FastMath.sin((float) angle);
+		this.x = Math.cos((float) angle);
+		this.y = Math.sin((float) angle);
 	}
 
 	public Vector(double x, double y)
@@ -39,8 +50,8 @@ public class Vector
 		double a = angle();
 		a += angle;
 
-		this.x = FastMath.cos((float) a) * m;
-		this.y = FastMath.sin((float) a) * m;
+		this.x = Math.cos((float) a) * m;
+		this.y = Math.sin((float) a) * m;
 
 		return this;
 	}
@@ -86,6 +97,26 @@ public class Vector
 	{
 		this.x *= sx;
 		this.y *= sy;
+		return this;
+	}
+
+	public Vector divide(double dx, double dy)
+	{
+		this.x /= dx;
+		this.y /= dy;
+		return this;
+	}
+
+	public Vector divide(Vector v)
+	{
+		divide(v.x, v.y);
+		return this;
+	}
+
+	public Vector divide(double divisor)
+	{
+		this.x /= divisor;
+		this.y /= divisor;
 		return this;
 	}
 
@@ -144,7 +175,12 @@ public class Vector
 
 	public float angle()
 	{
-		return FastMath.atan2((float) y, (float) x);
+		return (float) Math.atan2(y, x);
+	}
+
+	public String toString()
+	{
+		return String.format("Vector[%2.2f, %2.2f]", x, y);
 	}
 
 }

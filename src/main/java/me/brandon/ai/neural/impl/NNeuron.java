@@ -8,7 +8,10 @@ public class NNeuron implements Neuron
 {
 
 	private static int _id;
-	private final int id = _id++;
+	protected int id = _id++;
+
+	public int layer;
+	protected int index;
 
 	protected NConnection inputs[];
 
@@ -89,6 +92,16 @@ public class NNeuron implements Neuron
 		return id;
 	}
 
+	public void setLayer(int layer)
+	{
+		this.layer = layer;
+	}
+
+	public void setIndex(int index)
+	{
+		this.index = index;
+	}
+
 	public void setType(NeuronType type)
 	{
 		this.type = type;
@@ -117,5 +130,15 @@ public class NNeuron implements Neuron
 	public boolean isComputed()
 	{
 		return computed;
+	}
+
+	public int getLayer()
+	{
+		return layer;
+	}
+
+	public int getIndex()
+	{
+		return index;
 	}
 }

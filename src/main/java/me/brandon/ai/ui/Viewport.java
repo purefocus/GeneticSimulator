@@ -1,6 +1,6 @@
 package me.brandon.ai.ui;
 
-import me.brandon.ai.gensim.world.World;
+import me.brandon.ai.evolve.world.World;
 
 import java.awt.*;
 

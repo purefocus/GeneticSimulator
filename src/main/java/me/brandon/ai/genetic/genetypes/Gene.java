@@ -2,7 +2,7 @@ package me.brandon.ai.genetic.genetypes;
 
 import me.brandon.ai.genetic.Mutator;
 
-import static me.brandon.ai.genetic.Genetic.chance;
+import static me.brandon.ai.genetic.Chance.chance;
 
 public abstract class Gene<T extends Gene<T>> implements Comparable<Gene<?>>
 {

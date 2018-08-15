@@ -5,8 +5,8 @@ import me.brandon.ai.genetic.Mutator;
 import java.util.ArrayList;
 import java.util.List;
 
-import static me.brandon.ai.genetic.Genetic.chance;
-import static me.brandon.ai.genetic.Genetic.weightedChance;
+import static me.brandon.ai.genetic.Chance.chance;
+import static me.brandon.ai.genetic.Chance.weightedChance;
 
 public class GeneList<T extends Gene<T>> extends Gene<GeneList<T>>
 {

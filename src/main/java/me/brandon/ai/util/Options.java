@@ -15,7 +15,7 @@ public class Options
 	public static boolean showCreatureBounds = false;
 	public static boolean showCreatureFeelers = true;
 
-	// creature life
+	// focusedCreature life
 	public static float rod_neg_energy = 5.0f;
 	public static float size_energy_consumption = 0.0012f;
 	public static float rod_energy = 0.005f;

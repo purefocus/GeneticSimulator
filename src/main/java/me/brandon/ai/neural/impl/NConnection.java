@@ -7,13 +7,13 @@ public class NConnection implements Connection
 {
 
 	private static int _id;
-	private final int id = _id++;
+	protected int id = _id++;
 
-	private float weight;
+	protected float weight;
 
-	private Neuron source;
+	protected Neuron source;
 
-	private boolean enabled;
+	protected boolean enabled;
 
 	private float value;
 
@@ -36,9 +36,9 @@ public class NConnection implements Connection
 	}
 
 	@Override
-	public Neuron source()
+	public <T extends Neuron> T source()
 	{
-		return source;
+		return (T) source;
 	}
 
 	@Override
@@ -62,18 +62,28 @@ public class NConnection implements Connection
 		return id;
 	}
 
-	void setEnabled(boolean enabled)
+	public void setEnabled(boolean enabled)
 	{
 		this.enabled = enabled;
 	}
 
-	void setSource(Neuron source)
+	public void setSource(Neuron source)
 	{
 		this.source = source;
 	}
 
-	void setWeight(float weight)
+	public void setWeight(float weight)
 	{
 		this.weight = weight;
+	}
+
+	public int sourceLayer()
+	{
+		return ((NNeuron) source).getLayer();
+	}
+
+	public int sourceIndex()
+	{
+		return ((NNeuron) source).getIndex();
 	}
 }

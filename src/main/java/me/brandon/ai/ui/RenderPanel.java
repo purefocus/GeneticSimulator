@@ -1,9 +1,8 @@
 package me.brandon.ai.ui;
 
+import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.awt.image.BufferStrategy;
 
 public class RenderPanel extends Canvas implements ComponentListener
@@ -13,6 +12,17 @@ public class RenderPanel extends Canvas implements ComponentListener
 	{
 		setPreferredSize(new Dimension(width, height));
 		addComponentListener(this);
+	}
+
+	public void makeFrame()
+	{
+		JFrame frame = new JFrame("Render Panel");
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(this, BorderLayout.CENTER);
+		frame.setContentPane(panel);
+		frame.pack();
+		frame.setVisible(true);
 	}
 
 	private Renderer renderer;

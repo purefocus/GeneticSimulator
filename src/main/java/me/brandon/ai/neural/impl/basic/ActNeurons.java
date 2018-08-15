@@ -1,6 +1,7 @@
 package me.brandon.ai.neural.impl.basic;
 
 import me.brandon.ai.neural.Connection;
+import me.brandon.ai.neural.NeuronType;
 import me.brandon.ai.neural.impl.NNeuron;
 import me.brandon.ai.util.FastMath;
 
@@ -8,6 +9,16 @@ public class ActNeurons
 {
 	public static abstract class ActivationNeuron extends NNeuron
 	{
+		public ActivationNeuron()
+		{
+			this.type = NeuronType.Hidden;
+		}
+
+		public ActivationNeuron(NeuronType type)
+		{
+			this.type = type;
+		}
+
 		@Override
 		public float compute()
 		{

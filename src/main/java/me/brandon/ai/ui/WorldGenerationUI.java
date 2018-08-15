@@ -1,17 +1,14 @@
 package me.brandon.ai.ui;
 
-import me.brandon.ai.AIMain;
-import me.brandon.ai.gensim.GeneticSimulator;
-import me.brandon.ai.gensim.world.Tile;
-import me.brandon.ai.gensim.world.World;
-import me.brandon.ai.gensim.world.WorldGenerator;
+import me.brandon.ai.evolve.GeneticSimulator;
+import me.brandon.ai.evolve.world.Tile;
+import me.brandon.ai.evolve.world.World;
+import me.brandon.ai.evolve.world.WorldGenerator;
 import me.brandon.ai.util.Options;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-import static me.brandon.ai.gensim.world.WorldGenerator.generateTerrain;
+import static me.brandon.ai.evolve.world.WorldGenerator.generateTerrain;
 
 public class WorldGenerationUI extends JToolBar
 {

@@ -2,7 +2,7 @@ package me.brandon.ai.genetic;
 
 import java.util.Random;
 
-public class Genetic
+public class Chance
 {
 
 	public static Random rand = new Random(10);
@@ -15,6 +15,11 @@ public class Genetic
 	public static float randMax(float max)
 	{
 		return rand.nextFloat() * max;
+	}
+
+	public static float rand()
+	{
+		return rand.nextFloat();
 	}
 
 	public static float randVal()
