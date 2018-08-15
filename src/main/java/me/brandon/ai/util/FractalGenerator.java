@@ -2,8 +2,8 @@ package me.brandon.ai.util;
 
 import java.util.Random;
 
-import static me.brandon.ai.evolve.world.World.worldHeight;
-import static me.brandon.ai.evolve.world.World.worldWidth;
+import static me.brandon.ai.sim.evolve.world.World.worldHeight;
+import static me.brandon.ai.sim.evolve.world.World.worldWidth;
 
 public class FractalGenerator
 {

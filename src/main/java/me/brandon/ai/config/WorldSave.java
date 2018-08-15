@@ -1,7 +1,7 @@
 package me.brandon.ai.config;
 
-import me.brandon.ai.evolve.world.Tile;
-import me.brandon.ai.evolve.world.World;
+import me.brandon.ai.sim.evolve.world.Tile;
+import me.brandon.ai.sim.evolve.world.World;
 
 import java.io.*;
 

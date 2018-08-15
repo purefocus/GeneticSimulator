@@ -2,12 +2,12 @@ package me.brandon.ai;
 
 import me.brandon.ai.config.Configuration;
 import me.brandon.ai.config.WorldSave;
-import me.brandon.ai.evolve.GeneticSimulator;
-import me.brandon.ai.evolve.ThreadManager;
-import me.brandon.ai.evolve.world.creature.Creature;
-import me.brandon.ai.evolve.world.Tile;
-import me.brandon.ai.evolve.world.World;
-import me.brandon.ai.evolve.world.WorldGenerator;
+import me.brandon.ai.sim.evolve.GeneticSimulator;
+import me.brandon.ai.sim.evolve.ThreadManager;
+import me.brandon.ai.sim.evolve.world.creature.Creature;
+import me.brandon.ai.sim.evolve.world.Tile;
+import me.brandon.ai.sim.evolve.world.World;
+import me.brandon.ai.sim.evolve.world.WorldGenerator;
 import me.brandon.ai.ui.CreatureDataPanel;
 import me.brandon.ai.ui.GraphicsPanel;
 import me.brandon.ai.ui.SimulatorUI;

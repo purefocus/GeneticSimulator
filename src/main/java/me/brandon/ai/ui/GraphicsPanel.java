@@ -3,9 +3,9 @@ package me.brandon.ai.ui;
 import me.brandon.ai.AIMain;
 import me.brandon.ai.config.ConfigOption;
 import me.brandon.ai.config.WorldSave;
-import me.brandon.ai.evolve.GeneticSimulator;
-import me.brandon.ai.evolve.world.World;
-import me.brandon.ai.evolve.world.creature.Creature;
+import me.brandon.ai.sim.evolve.GeneticSimulator;
+import me.brandon.ai.sim.evolve.world.World;
+import me.brandon.ai.sim.evolve.world.creature.Creature;
 
 import java.awt.*;
 import java.awt.event.*;
