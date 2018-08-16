@@ -1,10 +1,11 @@
 package me.brandon.ai.api.genetic.genetypes;
 
+import me.brandon.ai.api.genetic.Genome;
 import me.brandon.ai.api.genetic.Mutator;
 
 import static me.brandon.ai.util.Chance.chance;
 
-public abstract class Gene<T extends Gene<T>> implements Comparable<Gene<?>>
+public abstract class Gene<T extends Gene<T>> implements Genome<T>, Comparable<Gene<?>>
 {
 	private static int _id;
 	/**
@@ -49,7 +50,7 @@ public abstract class Gene<T extends Gene<T>> implements Comparable<Gene<?>>
 	protected Mutator<T> mutator;
 
 	/**
-	 * Can this trait cross with any trait of the same type?
+	 * Can this trait doCross with any trait of the same type?
 	 */
 	protected boolean machAnyOfType;
 
@@ -63,7 +64,7 @@ public abstract class Gene<T extends Gene<T>> implements Comparable<Gene<?>>
 
 	/**
 	 * @param mutRate        - the probability of a mutation occuring
-	 * @param matchAnyOfType - can cross with any gene as long as they share the same type
+	 * @param matchAnyOfType - can doCross with any gene as long as they share the same type
 	 */
 	public Gene(float mutRate, boolean matchAnyOfType)
 	{
@@ -82,7 +83,7 @@ public abstract class Gene<T extends Gene<T>> implements Comparable<Gene<?>>
 	/**
 	 * @param mutRate        - the probability of a mutation occuring
 	 * @param mutator        - uses the specified mutator for mutations
-	 * @param matchAnyOfType - can cross with any gene as long as they share the same type
+	 * @param matchAnyOfType - can doCross with any gene as long as they share the same type
 	 */
 	public Gene(float mutRate, Mutator<T> mutator, boolean matchAnyOfType)
 	{
@@ -95,14 +96,15 @@ public abstract class Gene<T extends Gene<T>> implements Comparable<Gene<?>>
 	/**
 	 * Creates a new gene that is the child between two parents
 	 */
-	public <M extends T> M makeChild(T otherParent)
+	public <M extends T> M makeChild(M otherParent)
 	{
-		T child = createClone();
+		M child = createClone();
 		if (otherParent != null)
 		{
 			child.cross(otherParent);
 		}
-		return (M) child;
+		attemptMutate();
+		return child;
 	}
 
 	/**
@@ -110,15 +112,6 @@ public abstract class Gene<T extends Gene<T>> implements Comparable<Gene<?>>
 	 */
 	public abstract T cross(T other);
 
-
-	/**
-	 * Creates a new gene whose value is this gene crossed with another
-	 */
-	protected T doCross(Gene<?> other)
-	{
-		T crossed = cross((T) other);
-		return crossed;
-	}
 
 	/**
 	 * Generates a random value for the gene
@@ -211,24 +204,24 @@ public abstract class Gene<T extends Gene<T>> implements Comparable<Gene<?>>
 	}
 
 	/**
-	 * @return true if the other gene can cross with this gene
+	 * @return true if the other gene can doCross with this gene
 	 */
-	public boolean matches(Gene<?> other)
+	public boolean matches(Genome<?> other)
 	{
-		return identifier == other.identifier || (machAnyOfType && other.getClass().equals(getClass()));
+		return identifier == other.getIdentifier() || (machAnyOfType && other.getClass().equals(getClass()));
 	}
 
 	/**
 	 * Copies all the values from the other gene to this one
 	 */
-	protected abstract void copy(T other);
+	protected abstract void copyData(T other);
 
 	/**
 	 * Copies all the values from the other gene to this one
 	 */
-	protected void fullCopy(T other)
+	public void copy(T other)
 	{
-		// fullCopy values shared by all genes
+		// copy values shared by all genes
 		this.mutator = other.mutator;
 		this.mutRate = other.mutRate;
 		this.dormant = other.dormant;
@@ -236,8 +229,8 @@ public abstract class Gene<T extends Gene<T>> implements Comparable<Gene<?>>
 		this.identifier = other.identifier;
 		this.dominance = other.dominance;
 
-		// fullCopy other values for the specific gene
-		copy(other);
+		// copy other values for the specific gene
+		copyData(other);
 	}
 
 	/**
@@ -246,14 +239,14 @@ public abstract class Gene<T extends Gene<T>> implements Comparable<Gene<?>>
 	public abstract Object get();
 
 	/**
-	 * Creates a new object that is an exact fullCopy of the gene
+	 * Creates a new object that is an exact copy of the gene
 	 */
 	public <M extends T> M createClone()
 	{
 		try
 		{
 			Gene<T> newGene = ((T) this).getClass().newInstance();
-			newGene.fullCopy((M) this);
+			newGene.copy((M) this);
 
 			return (M) newGene;
 

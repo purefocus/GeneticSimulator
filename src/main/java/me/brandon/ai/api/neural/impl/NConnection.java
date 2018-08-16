@@ -79,11 +79,11 @@ public class NConnection implements Connection
 
 	public int sourceLayer()
 	{
-		return ((NNeuron) source).getLayer();
+		return ((BasicNeuron) source).getLayer();
 	}
 
 	public int sourceIndex()
 	{
-		return ((NNeuron) source).getIndex();
+		return ((BasicNeuron) source).getIndex();
 	}
 }

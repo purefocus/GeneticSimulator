@@ -65,7 +65,7 @@ public class NameGene extends Gene<NameGene>
 	}
 
 	@Override
-	protected void copy(NameGene other)
+	protected void copyData(NameGene other)
 	{
 		this.name = other.name;
 		this.nameLength = other.nameLength;

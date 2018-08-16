@@ -2,12 +2,12 @@ package me.brandon.ai.api.neural.impl.basic;
 
 import me.brandon.ai.api.neural.Connection;
 import me.brandon.ai.api.neural.NeuronType;
-import me.brandon.ai.api.neural.impl.NNeuron;
+import me.brandon.ai.api.neural.impl.BasicNeuron;
 import me.brandon.ai.util.FastMath;
 
 public class ActNeurons
 {
-	public static abstract class ActivationNeuron extends NNeuron
+	public static abstract class ActivationNeuron extends BasicNeuron
 	{
 		public ActivationNeuron()
 		{
@@ -49,7 +49,7 @@ public class ActNeurons
 		}
 	}
 
-	public static class MaxNeuron extends NNeuron
+	public static class MaxNeuron extends BasicNeuron
 	{
 		@Override
 		public float compute()
@@ -68,7 +68,7 @@ public class ActNeurons
 		}
 	}
 
-	public static class MinNeuron extends NNeuron
+	public static class MinNeuron extends BasicNeuron
 	{
 		@Override
 		public float compute()

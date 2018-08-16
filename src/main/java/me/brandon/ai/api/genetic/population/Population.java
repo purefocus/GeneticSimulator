@@ -1,6 +1,7 @@
 package me.brandon.ai.api.genetic.population;
 
 import me.brandon.ai.api.genetic.GeneticEntity;
+import me.brandon.ai.util.Chance;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +25,8 @@ public class Population<T extends GeneticEntity>
 	 * object that is responsible for generating the population
 	 */
 	private Populator<T> populator;
+
+	private float bestFitness;
 
 	/**
 	 * object that is responsible for determining what entities to delete
@@ -61,8 +64,21 @@ public class Population<T extends GeneticEntity>
 	 */
 	public T getBest()
 	{
-		sort();
-		return population.get(0);
+		T ret = null;
+		float bestFit = 0;
+		for (T ent : population)
+		{
+			if (ent.getFitness() >= bestFit)
+			{
+				ret = ent;
+				bestFit = ent.getFitness();
+			}
+		}
+		if (bestFit > bestFitness)
+		{
+			bestFitness = bestFit;
+		}
+		return ret;
 	}
 
 	/**
@@ -71,16 +87,21 @@ public class Population<T extends GeneticEntity>
 	public T getBestAlive()
 	{
 		T ret = null;
-		float max = 0;
+		float bestFit = 0;
 		for (T ent : population)
 		{
-			if (!ent.isDead() && ent.getFitness() >= max)
+			if (!ent.isDead() && ent.getFitness() >= bestFit)
 			{
 				ret = ent;
-				max = ent.getFitness();
+				bestFit = ent.getFitness();
 			}
 		}
 		return ret;
+	}
+
+	public T getRandom(int maxIndex)
+	{
+		return population.get((int) Chance.randMax(maxIndex));
 	}
 
 	/**
@@ -88,6 +109,7 @@ public class Population<T extends GeneticEntity>
 	 */
 	public void populate()
 	{
+		sort();
 		if (populator != null)
 		{
 			populator.populate(this, populationCount - population.size());
@@ -110,6 +132,11 @@ public class Population<T extends GeneticEntity>
 		aliveCount = alive;
 	}
 
+	public int getSize()
+	{
+		return population.size();
+	}
+
 	public int getAliveCount()
 	{
 		return aliveCount;
@@ -130,10 +157,17 @@ public class Population<T extends GeneticEntity>
 		return null;
 	}
 
-	public void addCreature(T creature)
+	public T addCreature(T creature)
 	{
 		population.add(creature);
+		return creature;
 	}
+
+	public T get(int index)
+	{
+		return population.get(index);
+	}
+
 
 	public void setPopulator(Populator<T> populator)
 	{
@@ -156,8 +190,6 @@ public class Population<T extends GeneticEntity>
 		}
 		return true;
 	}
-
-	double i = 0;
 
 	public void kill()
 	{
@@ -221,13 +253,9 @@ public class Population<T extends GeneticEntity>
 		return new float[]{average, max, upperQ, median, lowerQ, min};
 	}
 
-
-	/**
-	 * object that is responsible for generating the population
-	 */
-	public interface Populator<T extends GeneticEntity>
+	public void setPopulationSize(int populationSize)
 	{
-		void populate(Population<T> population, int amount);
+		this.populationCount = populationSize;
 	}
 
 

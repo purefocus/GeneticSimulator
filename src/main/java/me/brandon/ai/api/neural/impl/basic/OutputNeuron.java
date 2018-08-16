@@ -2,9 +2,9 @@ package me.brandon.ai.api.neural.impl.basic;
 
 import me.brandon.ai.api.neural.Connection;
 import me.brandon.ai.api.neural.NeuronType;
-import me.brandon.ai.api.neural.impl.NNeuron;
+import me.brandon.ai.api.neural.impl.BasicNeuron;
 
-public class OutputNeuron extends NNeuron
+public class OutputNeuron extends BasicNeuron
 {
 
 	public OutputNeuron()

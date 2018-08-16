@@ -1,6 +1,6 @@
 package me.brandon.ai.api.neural;
 
-import me.brandon.ai.ui.RenderPanel;
+import me.brandon.ai.ui.RenderPanel_old;
 
 import javax.swing.*;
 import java.awt.*;
@@ -47,7 +47,7 @@ public class Test
 			System.out.print("}\n");
 		}
 
-		RenderPanel renderPanel = new RenderPanel(300, 300);
+		RenderPanel_old renderPanel = new RenderPanel_old(300, 300);
 
 
 		JFrame frame = new JFrame();

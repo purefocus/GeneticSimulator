@@ -1,8 +1,8 @@
 package me.brandon.ai.sim.balance;
 
-import me.brandon.ai.api.genetic.population.Depop;
+import me.brandon.ai.api.genetic.population.PopUtil;
 import me.brandon.ai.api.genetic.population.Population;
-import me.brandon.ai.ui.RenderPanel;
+import me.brandon.ai.ui.RenderPanel_old;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -10,10 +10,10 @@ import java.awt.event.KeyListener;
 import java.util.List;
 
 
-public class BalanceCreatureSimulator implements RenderPanel.Renderer, Runnable, KeyListener
+public class BalanceCreatureSimulator implements RenderPanel_old.Renderer, Runnable, KeyListener
 {
 
-	public RenderPanel renderer;
+	public RenderPanel_old renderer;
 
 	public BalanceCreature focusedCreature;
 	Population<BalanceCreature> population;
@@ -29,7 +29,7 @@ public class BalanceCreatureSimulator implements RenderPanel.Renderer, Runnable,
 
 	public BalanceCreatureSimulator()
 	{
-		renderer = new RenderPanel(500, 500);
+		renderer = new RenderPanel_old(500, 500);
 		renderer.makeFrame();
 		renderer.addKeyListener(this);
 
@@ -72,7 +72,7 @@ public class BalanceCreatureSimulator implements RenderPanel.Renderer, Runnable,
 
 		});
 
-		population.setDepopulator(Depop.weightedFitness(3));
+		population.setDepopulator(PopUtil.weightedFitness(3));
 
 		population.populate();
 

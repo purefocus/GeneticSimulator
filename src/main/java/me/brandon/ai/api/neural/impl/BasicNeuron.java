@@ -4,7 +4,7 @@ import me.brandon.ai.api.neural.Connection;
 import me.brandon.ai.api.neural.Neuron;
 import me.brandon.ai.api.neural.NeuronType;
 
-public class NNeuron implements Neuron
+public class BasicNeuron implements Neuron
 {
 
 	private static int _id;
@@ -23,17 +23,17 @@ public class NNeuron implements Neuron
 
 	protected boolean enabled;
 
-	public NNeuron()
+	public BasicNeuron()
 	{
 		this(NeuronType.Input);
 	}
 
-	public NNeuron(NeuronType type)
+	public BasicNeuron(NeuronType type)
 	{
 		this(type, new NConnection[]{});
 	}
 
-	public NNeuron(NeuronType type, NConnection inputs[])
+	public BasicNeuron(NeuronType type, NConnection inputs[])
 	{
 		this.type = type;
 		this.inputs = inputs;
@@ -114,10 +114,14 @@ public class NNeuron implements Neuron
 
 	public void setEnabled(boolean enabled)
 	{
+		if (!enabled && type != NeuronType.Hidden)
+		{
+			enabled = true;
+		}
 		this.enabled = enabled;
 		for (NConnection in : inputs)
 		{
-			in.setEnabled(enabled);
+			in.setEnabled(enabled && in.enabled);
 		}
 
 	}

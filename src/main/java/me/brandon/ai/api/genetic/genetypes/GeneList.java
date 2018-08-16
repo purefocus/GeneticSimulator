@@ -42,7 +42,7 @@ public class GeneList<T extends Gene<T>> extends Gene<GeneList<T>>
 			{
 				if (a.matches(b))
 				{
-					a.doCross(b);
+					a.cross(b);
 					if (a.dormant || b.dormant)
 					{
 						if (a.dormant && b.dormant)
@@ -144,7 +144,7 @@ public class GeneList<T extends Gene<T>> extends Gene<GeneList<T>>
 	}
 
 	@Override
-	protected void copy(GeneList<T> other)
+	protected void copyData(GeneList<T> other)
 	{
 		geneList = new ArrayList<>();
 		other.geneList.forEach(gene -> geneList.add(gene.createClone()));

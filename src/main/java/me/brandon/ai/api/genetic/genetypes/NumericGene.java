@@ -52,7 +52,7 @@ public class NumericGene extends Gene<NumericGene>
 	}
 
 	@Override
-	protected void copy(NumericGene other)
+	protected void copyData(NumericGene other)
 	{
 		this.max = other.max;
 		this.min = other.min;

@@ -48,7 +48,7 @@ public class CreatureBrain
 
 		for (int j = 0; j < maxFeelers; j++)
 		{
-			neuronDataNames[i++] = "Feeler " + j + " (h)";
+			neuronDataNames[i++] = "Feeler " + j + " (height)";
 			neuronDataNames[i++] = "Feeler " + j + " (s)";
 			neuronDataNames[i++] = "Feeler " + j + " (v)";
 		}
@@ -198,7 +198,7 @@ public class CreatureBrain
 	public void setInput()
 	{
 
-		// fullCopy memory outputs to inputs
+		// copy memory outputs to inputs
 		for (int i = 0; i < creature.numMemory; i++)
 		{
 			neurons[i].value = neurons[inputNodeSize + i].value;

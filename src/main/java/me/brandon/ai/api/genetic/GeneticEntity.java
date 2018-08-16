@@ -1,8 +1,10 @@
 package me.brandon.ai.api.genetic;
 
 import me.brandon.ai.api.genetic.genetypes.Gene;
+import me.brandon.ai.ui.renderer.Renderer;
+import me.brandon.ai.util.GraphicsWrapper;
 
-public abstract class GeneticEntity<T extends GeneticEntity>
+public abstract class GeneticEntity<T extends GeneticEntity> implements Renderer
 {
 
 	protected int rank;
@@ -74,7 +76,7 @@ public abstract class GeneticEntity<T extends GeneticEntity>
 	}
 
 	/**
-	 * Creates a new GeneticEntity based on a cross between
+	 * Creates a new GeneticEntity based on a doCross between
 	 * this entity and another parent entity
 	 */
 	public abstract T makeChild(T par);
@@ -93,4 +95,10 @@ public abstract class GeneticEntity<T extends GeneticEntity>
 	}
 
 
+	public void draw(GraphicsWrapper g, int w, int h)
+	{
+
+	}
+
+	public abstract void firstGeneration();
 }

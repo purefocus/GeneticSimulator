@@ -1,9 +1,10 @@
 package me.brandon.ai.api.neural.util;
 
+import me.brandon.ai.api.neural.Neuron;
 import me.brandon.ai.api.neural.NeuronType;
+import me.brandon.ai.api.neural.impl.AbstractNetwork;
 import me.brandon.ai.api.neural.impl.NConnection;
-import me.brandon.ai.api.neural.impl.NNetwork;
-import me.brandon.ai.api.neural.impl.NNeuron;
+import me.brandon.ai.api.neural.impl.BasicNeuron;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -13,7 +14,7 @@ import java.util.Map;
 public class NetworkRenderer
 {
 
-	private final NNetwork network;
+	private final AbstractNetwork network;
 
 	private NodeData data[][];
 	private Map<Integer, NodeData> dataMap;
@@ -22,7 +23,7 @@ public class NetworkRenderer
 	private boolean needsBaseUpdate;
 	private boolean dataChanged;
 
-	public NetworkRenderer(NNetwork network)
+	public NetworkRenderer(AbstractNetwork network)
 	{
 		this.network = network;
 		this.dataMap = new HashMap<>();
@@ -31,13 +32,13 @@ public class NetworkRenderer
 
 		for (int i = 0; i < layerCount; i++)
 		{
-			NNeuron layer[] = network.getLayer(i);
+			Neuron layer[] = network.getLayer(i);
 			data[i] = new NodeData[layer.length];
 			for (int j = 0; j < layer.length; j++)
 			{
 				data[i][j] = new NodeData();
-				data[i][j].n = layer[j];
-				dataMap.put(layer[j].getId(), data[i][j]);
+				data[i][j].n = (BasicNeuron) layer[j];
+				dataMap.put(((BasicNeuron) layer[j]).getId(), data[i][j]);
 			}
 		}
 
@@ -57,7 +58,7 @@ public class NetworkRenderer
 		int posX = padX + spacingX / 2;
 		for (int i = 0; i < layerCount; i++)
 		{
-			NNeuron layer[] = network.getLayer(i);
+			BasicNeuron layer[] = network.getLayer(i);
 			int spacingY = height / (layer.length);
 			int posY = spacingY / 2;
 			for (int j = 0; j < layer.length; j++)
@@ -77,11 +78,14 @@ public class NetworkRenderer
 			NConnection cons[] = data.n.getInputs();
 			for (NConnection con : cons)
 			{
-				g.setColor(getWeightColor(con.weight()));
-				NodeData d = dataMap.get(((NNeuron) con.source()).getId());
-				if (d != null)
+				if (con.enabled())
 				{
-					g.drawLine(data.p.x, data.p.y, d.p.x, d.p.y);
+					g.setColor(getWeightColor(con.weight()));
+					NodeData d = dataMap.get(((BasicNeuron) con.source()).getId());
+					if (d != null)
+					{
+						g.drawLine(data.p.x, data.p.y, d.p.x, d.p.y);
+					}
 				}
 			}
 		});
@@ -90,14 +94,17 @@ public class NetworkRenderer
 		int h = metrics.getHeight() / 2;
 		dataMap.values().forEach(d ->
 		{
-			g.setColor(Color.DARK_GRAY);
-			g.fillOval(d.p.x - nodeSize, d.p.y - nodeSize / 2, nodeSize * 2, nodeSize);
-			g.setColor(getTypeColor(d.n.type()));
-			g.drawOval(d.p.x - nodeSize, d.p.y - nodeSize / 2, nodeSize * 2, nodeSize);
-			g.setColor(Color.WHITE);
-			String str = String.format("%2.2f", d.n.value());
-			int w = metrics.stringWidth(str) / 2;
-			g.drawString(str, d.p.x - w, d.p.y + h - 3);
+			if (d.n.enabled())
+			{
+				g.setColor(Color.DARK_GRAY);
+				g.fillOval(d.p.x - nodeSize, d.p.y - nodeSize / 2, nodeSize * 2, nodeSize);
+				g.setColor(getTypeColor(d.n.type()));
+				g.drawOval(d.p.x - nodeSize, d.p.y - nodeSize / 2, nodeSize * 2, nodeSize);
+				g.setColor(Color.WHITE);
+				String str = String.format("%2.2f", d.n.value());
+				int w = metrics.stringWidth(str) / 2;
+				g.drawString(str, d.p.x - w, d.p.y + h - 3);
+			}
 		});
 	}
 
@@ -125,11 +132,13 @@ public class NetworkRenderer
 		return Color.WHITE;
 	}
 
+	Color bg = new Color(64, 64, 64, 64);
+
 	public BufferedImage render(int width, int height)
 	{
 		if (img == null || img.getWidth() != width || img.getHeight() != height)
 		{
-			img = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+			img = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
 			needsBaseUpdate = true;
 		}
 
@@ -140,12 +149,14 @@ public class NetworkRenderer
 		}
 		Graphics2D g = (Graphics2D) img.getGraphics();
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g.setColor(Color.DARK_GRAY);
-		g.fillRect(0, 0, width, height);
+		g.setColor(bg);
+		g.fillRect(0, 0, width - 1, height - 1);
 
 		g.setStroke(new BasicStroke(2f));
 
 		renderValues(g);
+		g.setColor(Color.LIGHT_GRAY);
+		g.drawRect(0, 0, width - 1, height - 1);
 		g.dispose();
 
 		return img;
@@ -155,7 +166,7 @@ public class NetworkRenderer
 	private class NodeData
 	{
 		Point p;
-		NNeuron n;
+		BasicNeuron n;
 
 	}
 

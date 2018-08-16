@@ -265,6 +265,12 @@ public class BalanceCreature extends GeneticEntity<BalanceCreature>
 		return ret;
 	}
 
+	@Override
+	public void firstGeneration()
+	{
+		initNetwork();
+	}
+
 	public void draw(Graphics g)
 	{
 		g.setColor(new Color(0, 0, 0, 30));

@@ -5,10 +5,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferStrategy;
 
-public class RenderPanel extends Canvas implements ComponentListener
+public class RenderPanel_old extends Canvas implements ComponentListener
 {
 
-	public RenderPanel(int width, int height)
+	public RenderPanel_old(int width, int height)
 	{
 		setPreferredSize(new Dimension(width, height));
 		addComponentListener(this);

@@ -2,9 +2,10 @@ package me.brandon.ai.api.neural;
 
 import me.brandon.ai.api.neural.impl.NConnection;
 import me.brandon.ai.api.neural.impl.NNetwork;
-import me.brandon.ai.api.neural.impl.NNeuron;
+import me.brandon.ai.api.neural.impl.BasicNeuron;
 import me.brandon.ai.api.neural.impl.basic.InputNeuron;
 import me.brandon.ai.api.neural.impl.basic.OutputNeuron;
+import me.brandon.ai.util.Chance;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class NetworkFactory
 
 	private List<List<FactoryNeuron>> layers;
 
-	private Constructor<? extends NNeuron> neuronClass;
+	private Constructor<? extends BasicNeuron> neuronClass;
 	private Object[] neuronClassParameters;
 
 	public NetworkFactory()
@@ -50,11 +51,11 @@ public class NetworkFactory
 	 */
 	public <T extends Network> T build()
 	{
-		NNeuron neuronNetwork[][] = new NNeuron[layers.size()][];
+		BasicNeuron neuronNetwork[][] = new BasicNeuron[layers.size()][];
 		for (int i = 0; i < layers.size(); i++)
 		{
 			List<FactoryNeuron> layer = layers.get(i);
-			neuronNetwork[i] = new NNeuron[layer.size()];
+			neuronNetwork[i] = new BasicNeuron[layer.size()];
 			for (int j = 0; j < layer.size(); j++)
 			{
 				neuronNetwork[i][j] = layer.get(j).makeNeuron();
@@ -125,7 +126,7 @@ public class NetworkFactory
 	 * @param neuron - neuron object to add
 	 * @param layer  - the layer to add the neuron
 	 */
-	public NetworkFactory addNeuron(NNeuron neuron, int layer)
+	public NetworkFactory addNeuron(BasicNeuron neuron, int layer)
 	{
 		layers.get(layer).add(new FactoryNeuron(neuron, layer, layers.size()));
 		return this;
@@ -184,6 +185,43 @@ public class NetworkFactory
 		}
 
 		return this;
+	}
+
+	public NetworkFactory addRandomConnections(int fromLayer, int toLayer, int count)
+	{
+		List<FactoryNeuron> from = layers.get(fromLayer);
+		List<FactoryNeuron> to = layers.get(toLayer);
+		for (int i = 0; i < count; i++)
+		{
+			FactoryNeuron f = from.get((int) Chance.randMax(from.size()));
+			FactoryNeuron t = to.get((int) Chance.randMax(to.size()));
+			new FactoryConnection(f, t, Chance.rand());
+		}
+		return this;
+	}
+
+	public NetworkFactory addRandomConnectionPath(int fromLayer, int toLayer, int count)
+	{
+		for (int i = 0; i < count; i++)
+		{
+			List<FactoryNeuron> from = layers.get(fromLayer);
+			FactoryNeuron cur = from.get((int) Chance.randMax(from.size()));
+			for (int layer = fromLayer + 1; layer < toLayer; layer++)
+			{
+				if (layer < toLayer - 1)
+					layer = (int) (Chance.randMax(toLayer - layer) + layer);
+				cur = createRandom(cur, layer);
+			}
+		}
+		return this;
+	}
+
+	private FactoryNeuron createRandom(FactoryNeuron from, int targetLayer)
+	{
+		List<FactoryNeuron> to = layers.get(targetLayer);
+		FactoryNeuron ret = to.get((int) Chance.randMax(to.size()));
+		new FactoryConnection(from, ret, Chance.randVal());
+		return ret;
 	}
 
 
@@ -353,10 +391,29 @@ public class NetworkFactory
 		return this;
 	}
 
+	public NetworkFactory disableRandom(float chance)
+	{
+		layers.forEach(layer -> layer.forEach(neuron ->
+		{
+			neuron.enabled = !Chance.chance(chance);
+			if (!neuron.enabled)
+			{
+				neuron.outputs.forEach(o -> o.enabled = false);
+				neuron.inputs.forEach(o -> o.enabled = false);
+			}
+			else
+			{
+				neuron.outputs.forEach(o -> o.enabled = !Chance.chance(chance));
+				neuron.inputs.forEach(o -> o.enabled = !Chance.chance(chance));
+			}
+		}));
+		return this;
+	}
+
 	/**
 	 * @param neuronClass - the class type of the neuron to be created when building the network
 	 */
-	public NetworkFactory neuronClass(Class<? extends NNeuron> neuronClass, Class<?>[] constructors, Object... params)
+	public NetworkFactory neuronClass(Class<? extends BasicNeuron> neuronClass, Class<?>[] constructors, Object... params)
 	{
 		try
 		{
@@ -372,7 +429,7 @@ public class NetworkFactory
 	/**
 	 * @param neuronClass - the class type of the neuron to be created when building the network
 	 */
-	public NetworkFactory neuronClass(Class<? extends NNeuron> neuronClass)
+	public NetworkFactory neuronClass(Class<? extends BasicNeuron> neuronClass)
 	{
 		try
 		{
@@ -385,13 +442,13 @@ public class NetworkFactory
 		return this;
 	}
 
-	private NNeuron makeNewNeuron(NeuronType type)
+	private BasicNeuron makeNewNeuron(NeuronType type)
 	{
 		if (neuronClass != null)
 		{
 			try
 			{
-				NNeuron neuron = neuronClass.newInstance(neuronClassParameters);
+				BasicNeuron neuron = neuronClass.newInstance(neuronClassParameters);
 				neuron.setType(type);
 
 				return neuron;
@@ -401,14 +458,14 @@ public class NetworkFactory
 				e.printStackTrace();
 			}
 		}
-		return new NNeuron(type);
+		return new BasicNeuron(type);
 	}
 
-	private NNeuron fromNeuron(NNeuron n)
+	private BasicNeuron fromNeuron(BasicNeuron n)
 	{
 		try
 		{
-			NNeuron neuron = n.getClass().newInstance();
+			BasicNeuron neuron = n.getClass().newInstance();
 			neuron.setType(n.type());
 
 			return neuron;
@@ -418,7 +475,7 @@ public class NetworkFactory
 			e.printStackTrace();
 		}
 
-		return new NNeuron();
+		return new BasicNeuron();
 	}
 
 	public NetworkFactory fromExisting(NNetwork net)
@@ -430,7 +487,7 @@ public class NetworkFactory
 			List<FactoryNeuron> layer = getLayer(lay);
 			for (int i = 0; i < neurons.length; i++)
 			{
-				NNeuron n = neurons[i];
+				BasicNeuron n = neurons[i];
 				FactoryNeuron newNeuron = new FactoryNeuron(fromNeuron(n), lay, i);
 				layer.add(newNeuron);
 
@@ -472,7 +529,9 @@ public class NetworkFactory
 		final int id;
 		NeuronType type;
 		final int layer;
-		NNeuron neuron;
+		BasicNeuron neuron;
+
+		boolean enabled;
 
 		List<FactoryConnection> inputs;
 		List<FactoryConnection> outputs;
@@ -486,15 +545,17 @@ public class NetworkFactory
 			this.neuron = makeNewNeuron(type);
 			this.neuron.layer = layer;
 			this.neuron.setIndex(index);
+			this.enabled = neuron.enabled();
 		}
 
-		FactoryNeuron(NNeuron neuron, int layer, int index)
+		FactoryNeuron(BasicNeuron neuron, int layer, int index)
 		{
 			this(layer);
 			this.type = neuron.type();
 			this.neuron = neuron;
 			this.neuron.layer = layer;
 			this.neuron.setIndex(index);
+			this.enabled = neuron.enabled();
 		}
 
 		FactoryNeuron(int layer)
@@ -503,19 +564,25 @@ public class NetworkFactory
 			this.layer = layer;
 			inputs = new ArrayList<>();
 			outputs = new ArrayList<>();
+			this.enabled = true;
 		}
 
-		NNeuron makeNeuron()
+		BasicNeuron makeNeuron()
 		{
+
+			if (type == NeuronType.Input || type == NeuronType.Output)
+				enabled = true;
 
 			NConnection connections[] = new NConnection[inputs.size()];
 			for (int i = 0; i < inputs.size(); i++)
 			{
 				FactoryConnection con = inputs.get(i);
 				connections[i] = new NConnection(con.from.neuron, con.weight);
+				connections[i].setEnabled(con.enabled && con.to.enabled && con.from.enabled);
 			}
 
 			neuron.setConnections(connections);
+			neuron.setEnabled(enabled);
 			return neuron;
 		}
 
@@ -528,6 +595,7 @@ public class NetworkFactory
 
 		float weight;
 		boolean weightSet = false;
+		boolean enabled = true;
 
 		FactoryConnection()
 		{
@@ -539,6 +607,7 @@ public class NetworkFactory
 			this(from, to);
 			this.weight = weight;
 			this.weightSet = true;
+			this.enabled = from.enabled && to.enabled;
 		}
 
 		FactoryConnection(FactoryNeuron from, FactoryNeuron to)
@@ -548,6 +617,7 @@ public class NetworkFactory
 
 			this.from = from;
 			this.to = to;
+			this.enabled = from.enabled && to.enabled;
 
 			set();
 		}
@@ -562,8 +632,22 @@ public class NetworkFactory
 
 		void set()
 		{
-			to.inputs.add(this);
-			from.outputs.add(this);
+			if (!to.inputs.contains(this))
+			{
+				to.inputs.add(this);
+			}
+			else
+			{
+				to.inputs.remove(this);
+			}
+			if (!from.outputs.contains(this))
+			{
+				from.outputs.add(this);
+			}
+			else
+			{
+				from.outputs.remove(this);
+			}
 		}
 
 		public boolean equals(Object obj)
