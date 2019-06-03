@@ -375,6 +375,7 @@ public class BrainFactory
 		int id;
 		int layer;
 		boolean enabled;
+		float bias;
 
 		NodeType type;
 

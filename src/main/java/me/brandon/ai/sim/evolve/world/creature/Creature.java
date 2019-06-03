@@ -208,7 +208,7 @@ public class Creature implements WorldEntity
 			energyUsage += Math.abs(impulse) * impulse_energy_consumption;
 
 
-			direction += limit(-0.5f, 0.5f, angularVelocity);
+			direction += limit(-0.5f, 0.5f, angularVelocity+rand.nextFloat()*0.05f);
 
 			while (direction > 360)
 			{
@@ -220,12 +220,12 @@ public class Creature implements WorldEntity
 				direction += 360;
 			}
 
-			vel = Vector.fromAngle(direction, Math.min(Math.max(impulse, -maxSpeed), maxSpeed));
+			vel = Vector.fromAngle(Math.toRadians(direction), Math.min(Math.max(impulse, -maxSpeed), maxSpeed));
 
 			pos.add(vel);
 			consumeRate = (size) / 850f;
 
-			if(impulse < 0)
+			if (impulse < 0)
 			{
 				energyUsage *= 1.5;
 			}
@@ -250,9 +250,9 @@ public class Creature implements WorldEntity
 				else
 				{
 
-					float affinity = 1f - Math.abs(foodType - tile.getFoodType()) * 0.2f;
-					float consumed = tile.consume(consumeRate) * affinity * 5f;
-					energy += consumed * affinity;
+					float affinity = 1f - Math.abs(foodType - tile.getFoodType());
+					float consumed = tile.consume(consumeRate/4) * affinity * 20f;
+					energy +=  consumed * affinity;
 				}
 
 			}
@@ -335,7 +335,8 @@ public class Creature implements WorldEntity
 				g.setColor(Color.WHITE);
 				drawRect(g, bounds.x, bounds.y, bounds.width, bounds.height, view);
 			}
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 
 		}

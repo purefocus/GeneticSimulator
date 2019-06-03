@@ -57,6 +57,7 @@ public class CreatureBrain
 		neuronDataNames[i++] = "Energy";
 
 
+		neuronDataNames[i++] = "Random";
 		neuronDataNames[i] = "1";
 
 		// outputs
@@ -208,7 +209,7 @@ public class CreatureBrain
 		int nEnd;
 		int n;
 
-		neurons[inputNodeSize - 1].value = 0.5f;
+		neurons[inputNodeSize - 1].value = 1f;
 
 		Creature.FeatureExtension[] feelers = creature.feelers;
 		nEnd = nStart + maxFeelers * 3;
@@ -222,7 +223,8 @@ public class CreatureBrain
 		n = nEnd;
 
 		neurons[n++].value = 1.0f / (creature.age + 1);
-		neurons[n].value = creature.energy / 10f;
+		neurons[n++].value = creature.energy / 10f;
+		neurons[n].value = (float) Math.random();
 
 	}
 
@@ -368,6 +370,7 @@ public class CreatureBrain
 
 		void activate()
 		{
+//			value = (float) Math.tanh(value);
 //			value = value < 0.3 ? -1 : value > 0.3 ? 1 : 0;
 		}
 

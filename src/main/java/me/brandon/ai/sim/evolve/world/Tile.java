@@ -11,7 +11,7 @@ import java.awt.*;
 public class Tile implements Drawable
 {
 	@ConfigOption
-	public static float tile_maxFood = 0.5f;
+	public static float tile_maxFood = 1f;
 
 	public static double borderSize = 0;
 
@@ -24,7 +24,7 @@ public class Tile implements Drawable
 	protected float temperature; // saturation
 	protected float foodType; // hue
 
-	protected float growthRate = 0.00001f;
+	protected float growthRate = 0.0001f;
 	protected float maxGrowth = tile_maxFood;
 
 	boolean isWater = false;

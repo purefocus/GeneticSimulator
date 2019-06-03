@@ -7,7 +7,7 @@ public class Options
 
 	public static final Random rand = new Random(10);
 
-	public static int min_population = 3;
+	public static int min_population = 20;
 
 	public static boolean forceRender = false;
 
@@ -19,19 +19,21 @@ public class Options
 	public static float rod_neg_energy = 5.0f;
 	public static float size_energy_consumption = 0.0012f;
 	public static float rod_energy = 0.005f;
-	public static float impulse_energy_consumption = 0.005f;
+	public static float impulse_energy_consumption = 0.001f;
 
 	// genetics
 	public static int maxFeelers = 6;
 	public static int maxMemory = 4;
 
-	public static float minSize = 5f;
+	public static float minSize = 10f;
 
 	public static int inputNodeSize = maxMemory
 			+ 3 * maxFeelers // feelers
 			+ 1 // age
 			+ 1 // energy
-			+ 1; // constant
+			+ 1 // constant
+			+ 1 // Random
+			;
 
 	public static int outputNodeSize = maxMemory
 			+ 1 // needle length
@@ -66,7 +68,7 @@ public class Options
 	public static float mut_brain_connection_addition = 0.3f;
 
 	public static float mut_brain_wight_amnt = 0.005f;
-
+	public static float mut_brain_bias_amnt = 0.005f;
 	public static float brain_weight_init_mag = 1f;
 
 

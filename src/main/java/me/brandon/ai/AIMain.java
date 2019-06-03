@@ -59,6 +59,7 @@ public class AIMain implements Runnable
 		simulator.addCreature(new Creature(simulator.getWorld()));
 
 		simulator.startSimulation();
+		SwingUtilities.invokeLater(()-> simulator.getWorld().view.fitToScreen());
 
 
 	}

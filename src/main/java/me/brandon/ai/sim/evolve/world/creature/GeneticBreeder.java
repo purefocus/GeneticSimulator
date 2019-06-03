@@ -18,7 +18,7 @@ public class GeneticBreeder
 		if (p2 == null)
 			p2 = p1;
 
-		int gen =  Math.max(p1.generation, p2.generation) + 1;
+		int gen = Math.max(p1.generation, p2.generation) + 1;
 		Creature creature = new Creature(GeneticSimulator.world(), gen);
 
 		creature.generation = gen;
@@ -66,7 +66,8 @@ public class GeneticBreeder
 		creature.brain = factory.generate(creature);
 
 
-		creature.pos = p1.pos.clone();
+		creature.pos = p1.pos.clone().add(Math.random() * 2 - 1, Math.random() * 2 - 1);
+		creature.direction = rand.nextFloat() * 360;
 
 		creature.fin();
 

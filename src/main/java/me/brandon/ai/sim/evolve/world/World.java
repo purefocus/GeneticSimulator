@@ -19,7 +19,7 @@ public class World implements WorldEntity
 	public static Creature selectedCreature;
 
 	@ConfigOption(option = "world_water_level")
-	public static float waterLevel = 0.5f;
+	public static float waterLevel = 0.2f;
 
 	@ConfigOption(option = "world_size_width")
 	public static int worldWidth = 20;
@@ -56,7 +56,7 @@ public class World implements WorldEntity
 
 	public World(GeneticSimulator sim)
 	{
-		World.world = world;
+		World.world = sim.getWorld();
 		this.sim = sim;
 		creatures = new ArrayList<>();
 		birthQueue = new ArrayList<>();
