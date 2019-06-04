@@ -139,17 +139,22 @@ public class CreatureBrain
 				{
 					if (neurons[i].enabled && neurons[i].layer == c)
 					{
-						g.setColor(Color.WHITE);
-						if (c == 0)
+						try
 						{
-							g.drawString(neuronDataNames[i], spacingX, posY + 5);
+							g.setColor(Color.WHITE);
+							if (c == 0)
+							{
+								g.drawString(neuronDataNames[i], spacingX, posY + 5);
+							}
+							else if (neurons[i].type == NeuronType.Output)
+							{
+								g.drawString(neuronDataNames[i], width - spacingX - nameSize, posY + 5);
+							}
 						}
-						else if (neurons[i].type == NeuronType.Output)
+						catch (Exception e)
 						{
-							g.drawString(neuronDataNames[i], width - spacingX - nameSize, posY + 5);
+
 						}
-
-
 						neurons[i].p = new Point(posX, posY);
 						posY += nodeSpaceY;
 					}
@@ -189,7 +194,8 @@ public class CreatureBrain
 					g.drawString(str, p.x - w / 2, p.y + 5);
 				}
 			}
-		} catch (Exception e)
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -337,6 +343,7 @@ public class CreatureBrain
 		NeuronType type = NeuronType.Hidden;
 		boolean enabled = true;
 		boolean computed;
+		float keep = 0;
 		Point p;
 
 		Neuron()
@@ -352,7 +359,7 @@ public class CreatureBrain
 		public void add(float val)
 		{
 			if (computed)
-				value = val;
+				value = val * keep;
 			else
 				value += val;
 			computed = false;

@@ -197,6 +197,8 @@ public class BrainFactory
 		{
 			CreatureBrain.Neuron n = brain.neurons[i] = new CreatureBrain.Neuron();
 			brain.layerCount = Math.max(n.layer = nodes.get(i).layer, brain.layerCount);
+
+			n.keep = nodes.get(i).keep;
 		}
 
 		brain.layerCount++;
@@ -272,11 +274,12 @@ public class BrainFactory
 			return null;
 		}
 		Node node = addNode();
+		node.keep = rand.nextFloat() < 0.25 ? rand.nextFloat() : 0;
 		node.layer = (int) ((upper - lower + 1) * rand.nextFloat() + lower);
 		node.type = NodeType.Hidden;
 
 		Connection newCon = new Connection();
-		newCon.weight = rand.nextFloat() - 0.5f;
+		newCon.weight = 1 + rand.nextFloat() * 0.1f - 0.05f;
 		newCon.out = con.out;
 		newCon.in = node;
 		con.out = node;
@@ -313,7 +316,9 @@ public class BrainFactory
 			same = true;
 		}
 		generation = Math.max(b1.creature.generation, b2.creature.generation) + 1;
+
 		int nodeSize = Math.max(b1.neurons.length, b2.neurons.length);
+
 		for (int i = nodes.size(); i < nodeSize; i++)
 		{
 			addNode();
@@ -376,7 +381,7 @@ public class BrainFactory
 		int layer;
 		boolean enabled;
 		float bias;
-
+		float keep = 0;
 		NodeType type;
 
 		List<Connection> inputs = new ArrayList<>();

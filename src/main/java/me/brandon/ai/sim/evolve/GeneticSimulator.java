@@ -71,7 +71,8 @@ public class GeneticSimulator implements Drawable, Runnable
 			sem.acquire();
 			world.addCreature(creature);
 			sem.release();
-		} catch (InterruptedException e)
+		}
+		catch (InterruptedException e)
 		{
 			e.printStackTrace();
 		}
@@ -85,6 +86,7 @@ public class GeneticSimulator implements Drawable, Runnable
 			thread = new Thread(this);
 			thread.start();
 		}
+
 	}
 
 	public void stopSimulation()
@@ -97,6 +99,45 @@ public class GeneticSimulator implements Drawable, Runnable
 
 	private int chunkStartIndex;
 	private int remainingSize;
+
+	private interface ChunkedThreadRunner
+	{
+		void execute(int pos);
+	}
+
+	private void runChunkedThreads(int remainingSize, ChunkedThreadRunner threadRunner)
+	{
+		try
+		{
+			int chunkStart = 0;
+			int chunkSize = 0;
+			while (remainingSize > 0)
+			{
+				sem.acquire();
+				if (remainingSize > 0)
+				{
+					chunkStart = chunkStartIndex;
+					chunkSize = Math.max(remainingSize / (ThreadManager.NUM_THREADS * 2), thread_chunk_size_min);
+					chunkSize = Math.min(remainingSize, chunkSize);
+
+					remainingSize -= chunkSize;
+				}
+				sem.release();
+
+				if (chunkSize > 0)
+				{
+					for (int pos = chunkStart, end = pos + chunkSize; pos < end; pos++)
+					{
+						threadRunner.execute(pos);
+					}
+				}
+			}
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+	}
 
 	public void run()
 	{
@@ -114,141 +155,39 @@ public class GeneticSimulator implements Drawable, Runnable
 			graphicsPanel.render();
 
 			List<Creature> creatures = world.getCreatures();
-			remainingSize = creatures.size();
+			int size = creatures.size();
 
 
-			threadManager.runParallelTask(() ->
-			{
-
-				try
-				{
-					int chunkStart = 0;
-					int chunkSize = 0;
-					while (remainingSize > 0)
-					{
-						sem.acquire();
-						if (remainingSize > 0)
-						{
-							chunkStart = chunkStartIndex;
-							chunkSize = Math.max(remainingSize / (ThreadManager.NUM_THREADS * 2), thread_chunk_size_min);
-							chunkSize = Math.min(remainingSize, chunkSize);
-
-							remainingSize -= chunkSize;
-						}
-						sem.release();
-
-						if (chunkSize > 0)
-						{
-							for (int pos = chunkStart, end = pos + chunkSize; pos < end; pos++)
-							{
-								creatures.get(pos).updateSensors();
-							}
-						}
-					}
-				} catch (InterruptedException e)
-				{
-					e.printStackTrace();
-				}
-
-
-				//TODO: collect sensor data
-			});
-
+			threadManager.runParallelTask(() -> runChunkedThreads(size, p -> creatures.get(p).updateSensors()));
 			threadManager.waitForAll();
-			remainingSize = creatures.size();
 
-			threadManager.runParallelTask(() ->
-			{
-				try
-				{
-					int chunkStart = 0;
-					int chunkSize = 0;
-					while (remainingSize > 0)
-					{
-						sem.acquire();
-						if (remainingSize > 0)
-						{
-							chunkStart = chunkStartIndex;
-							chunkSize = Math.max(remainingSize / (ThreadManager.NUM_THREADS * 2), thread_chunk_size_min);
-							chunkSize = Math.min(remainingSize, chunkSize);
-
-							remainingSize -= chunkSize;
-						}
-						sem.release();
-
-						if (chunkSize > 0)
-						{
-							for (int pos = chunkStart, end = pos + chunkSize; pos < end; pos++)
-							{
-								creatures.get(pos).calculateBrain();
-							}
-						}
-					}
-				} catch (InterruptedException e)
-				{
-					e.printStackTrace();
-				}
-			});
-
+			threadManager.runParallelTask(() -> runChunkedThreads(size, p -> creatures.get(p).calculateBrain()));
 			threadManager.waitForAll();
-			remainingSize = creatures.size();
 
-			threadManager.runParallelTask(() ->
-			{
-				try
-				{
-					int chunkStart = 0;
-					int chunkSize = 0;
-					while (remainingSize > 0)
-					{
-						sem.acquire();
-						if (remainingSize > 0)
-						{
-							chunkStart = chunkStartIndex;
-							chunkSize = Math.max(remainingSize / (ThreadManager.NUM_THREADS * 2), thread_chunk_size_min);
-							chunkSize = Math.min(remainingSize, chunkSize);
-
-							remainingSize -= chunkSize;
-						}
-						sem.release();
-
-						if (chunkSize > 0)
-						{
-							for (int pos = chunkStart, end = pos + chunkSize; pos < end; pos++)
-							{
-								creatures.get(pos).tick(time);
-							}
-						}
-					}
-				} catch (InterruptedException e)
-				{
-					e.printStackTrace();
-				}
-			});
-
+			threadManager.runParallelTask(() -> runChunkedThreads(size, p -> creatures.get(p).tick(time)));
 			threadManager.waitForAll();
+
 			world.tick(time);
 
-//			threadManager.runParallelTask(() ->
-//			{
-//				//TODO: breed
-//			});
-//
-//			threadManager.waitForAll();
-
-			try
-			{
-				long wait = (long) (1000 / ticksPerSecond);
-				if (wait > 0)
-				{
-					Thread.sleep(wait);
-				}
-			} catch (InterruptedException e)
-			{
-				e.printStackTrace();
-			}
+			sleepDelay();
 		}
 
+	}
+
+	private void sleepDelay()
+	{
+		try
+		{
+			long wait = (long) (1000 / ticksPerSecond);
+			if (wait > 0)
+			{
+				Thread.sleep(wait);
+			}
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	@Override

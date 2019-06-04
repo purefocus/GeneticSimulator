@@ -17,6 +17,9 @@ import static me.brandon.ai.util.Options.*;
 public class Creature implements WorldEntity
 {
 
+	private static int _id = 0;
+	private final int id = _id++;
+
 	@ConfigOption(option = "creature_min_size")
 	public static int minSize = 30;
 
@@ -47,7 +50,7 @@ public class Creature implements WorldEntity
 
 	// ---------- Chance Traits ----------
 	public float remainingLife = 5f;
-	public float baseSize = 2;
+	public float baseSize = 4;
 	public float size = 5;
 	public float maxNeedleLength = 10f;
 	public float maxSize = 12f;
@@ -64,6 +67,8 @@ public class Creature implements WorldEntity
 	public String name;
 
 	public boolean alive;
+
+	public boolean attacking = false;
 
 	public Tile tile;
 
@@ -199,6 +204,20 @@ public class Creature implements WorldEntity
 	{
 		if (alive)
 		{
+			attacking = false;
+			if (needleLength > 0.01)
+			{
+				for (Creature creature : world.getCreatures())
+				{
+					if (creature.id != id && needle.intersects(creature))
+					{
+						creature.energy -= 0.5;
+						energy += 0.25;
+						attacking = true;
+					}
+				}
+			}
+
 			age += 0.01;
 			if (remainingLife <= 0)
 			{
@@ -208,7 +227,7 @@ public class Creature implements WorldEntity
 			energyUsage += Math.abs(impulse) * impulse_energy_consumption;
 
 
-			direction += limit(-0.5f, 0.5f, angularVelocity+rand.nextFloat()*0.05f);
+			direction += limit(-0.5f, 0.5f, angularVelocity + rand.nextFloat() * 0.05f);
 
 			while (direction > 360)
 			{
@@ -251,8 +270,8 @@ public class Creature implements WorldEntity
 				{
 
 					float affinity = 1f - Math.abs(foodType - tile.getFoodType());
-					float consumed = tile.consume(consumeRate/4) * affinity * 20f;
-					energy +=  consumed * affinity;
+					float consumed = tile.consume(consumeRate) * affinity * 5f;
+					energy += consumed * affinity;
 				}
 
 			}
@@ -284,11 +303,12 @@ public class Creature implements WorldEntity
 				if (energy > 0)
 				{
 					Creature c = GeneticBreeder.breed(this);
-					c.energy = c.baseSize;
+					c.energy = baseSize;
 
 					world.addCreature(c);
 				}
 			}
+
 		}
 	}
 
@@ -308,6 +328,11 @@ public class Creature implements WorldEntity
 	{
 		try
 		{
+			if(attacking)
+			{
+				g.setColor(Color.red);
+				fillCircle(g, pos.x, pos.y, size * 2, view);
+			}
 
 			g.setColor(Color.RED);
 			drawLine(g, pos.x, pos.y, needle.endPos.x, needle.endPos.y, view);

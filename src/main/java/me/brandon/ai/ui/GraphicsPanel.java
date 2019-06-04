@@ -112,12 +112,8 @@ public class GraphicsPanel extends Canvas implements MouseListener, MouseWheelLi
 
 		g.setColor(Color.WHITE);
 		g.drawString(String.format("view: [%2.1f, %2.1f, %2.1f, %2.1f, %2.2f]", view.x, view.y, view.width, view.height, view.PxToWorldScale), (int) 10, (int) 15);
-		if (mouseLocation != null)
-		{
-			g.drawString(String.format("mouse: [%d, %d]", mouseLocation.x, mouseLocation.y), (int) 10, (int) 15);
-		}
 
-		g.drawString(String.format("world: [time: %2.2f pop: %d]", world.getTime() / 100f, world.getPopulationCount()), 10, 30);
+		g.drawString(String.format("world: [time: %2.2f pop: %d]", world.getTime() / 100f, World.popCount), 10, 30);
 
 		g.drawRect(view.pixelX, view.pixelY, view.pixelWidth, view.pixelHeight);
 //		p.render(g);

@@ -3,6 +3,7 @@ package me.brandon.ai.sim.evolve.world;
 import me.brandon.ai.config.ConfigOption;
 import me.brandon.ai.ui.Drawable;
 import me.brandon.ai.ui.Viewport;
+import me.brandon.ai.util.Options;
 
 import static me.brandon.ai.sim.evolve.world.World.*;
 
@@ -24,7 +25,7 @@ public class Tile implements Drawable
 	protected float temperature; // saturation
 	protected float foodType; // hue
 
-	protected float growthRate = 0.0001f;
+	protected float growthRate = 0.001f;
 	protected float maxGrowth = tile_maxFood;
 
 	boolean isWater = false;
@@ -62,7 +63,7 @@ public class Tile implements Drawable
 		else
 		{
 			maxGrowth = this.foodLevel;
-			growthRate = 0.01f * this.maxGrowth;
+			growthRate = 0.1f * this.maxGrowth * (2 - waterLevel - temperature);
 		}
 	}
 
@@ -75,7 +76,7 @@ public class Tile implements Drawable
 	{
 		if (foodLevel < maxGrowth)
 		{
-			foodLevel += growthRate;
+			foodLevel += growthRate * (1 - temperature);
 			foodLevel = Math.min(maxGrowth, foodLevel);
 		}
 		else
@@ -107,7 +108,7 @@ public class Tile implements Drawable
 		}
 		if (request < 0)
 			return 0;
-		float consumed = Math.min(request, foodLevel);
+		float consumed = foodLevel*Math.min(request, foodLevel);
 		foodLevel -= consumed;
 
 		return consumed;

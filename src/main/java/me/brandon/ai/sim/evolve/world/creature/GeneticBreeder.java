@@ -66,7 +66,7 @@ public class GeneticBreeder
 		creature.brain = factory.generate(creature);
 
 
-		creature.pos = p1.pos.clone().add(Math.random() * 2 - 1, Math.random() * 2 - 1);
+		creature.pos = p1.pos.clone().add(10, 10);
 		creature.direction = rand.nextFloat() * 360;
 
 		creature.fin();

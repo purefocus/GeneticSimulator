@@ -30,7 +30,7 @@ public class World implements WorldEntity
 	@ConfigOption(option = "tile_size")
 	public static int tileSize = 100;
 
-
+	public static int popCount;
 	private int time;
 
 	private List<Tile> updating;
@@ -110,6 +110,7 @@ public class World implements WorldEntity
 	public synchronized void addCreature(Creature creature)
 	{
 		birthQueue.add(creature);
+		System.out.println(birthQueue.size());
 	}
 
 
@@ -199,7 +200,8 @@ public class World implements WorldEntity
 				try
 				{
 					updating.removeIf(t -> !t.updating);
-				} catch (Exception e)
+				}
+				catch (Exception e)
 				{
 
 				}
@@ -234,6 +236,8 @@ public class World implements WorldEntity
 		{
 			creatures.removeIf(c -> !c.isAlive());
 		}
+
+		popCount = creatures.size();
 
 		if (getPopulationCount() < Options.min_population)
 		{
