@@ -1,4 +1,4 @@
-# GeneticSimulator
+# GeneticSimulator (Work in Progress)
 
 This is a personal project of mine in an attempt to create a terrarium of creatures that evolve over time.
 This is developed using Java and no third party libraries are used.
